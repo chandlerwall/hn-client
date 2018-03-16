@@ -1,0 +1,22 @@
+{
+  "name": "hn-node",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "server": "nodemon --watch '*.ts' --exec ts-node server.ts",
+    "start": "yarn run server"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^8.0.47",
+    "nodemon": "^1.17.2",
+    "ts-node": "^3.3.0",
+    "typescript": "^2.5.3"
+  },
+  "dependencies": {
+    "@types/firebase": "^3.2.1",
+    "firebase": "^4.11.0"
+  }
+}
