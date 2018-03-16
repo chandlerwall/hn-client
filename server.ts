@@ -4,6 +4,8 @@ let hn = new HackerNewsApi();
 
 // gets the front page of HN
 var items = hn.fetchItemIds("topstories").then(itemIDs => {
+  
+  // this slice just avoid extra calls for now
   itemIDs = itemIDs.slice(0, 1);
 
   // takes those items and grab the details for it
