@@ -17,6 +17,8 @@
   },
   "dependencies": {
     "@types/firebase": "^3.2.1",
-    "firebase": "^4.11.0"
+    "@types/nedb": "^1.8.5",
+    "firebase": "^4.11.0",
+    "nedb": "^1.8.0"
   }
 }
