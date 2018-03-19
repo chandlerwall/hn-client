@@ -39,6 +39,8 @@ var items = hn.fetchItemIds("topstories").then(itemIDs => {
           console.log("insert result", newDoc);
         }
       });
+
+      // TODO: consider building a giant normalized list and then doing a final denorm step... that final obj coudl be saved too as a cache.
     });
   });
 });
