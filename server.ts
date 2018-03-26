@@ -102,3 +102,8 @@ async function addItemToDb(item: Item) {
     });
   });
 }
+
+var port = process.env.PORT || 3000;
+app.listen(port);
+
+console.log("server is running on port 80");
