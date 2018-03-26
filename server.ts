@@ -2,10 +2,24 @@ import { HackerNewsApi } from "./api";
 import * as nedb from "nedb";
 import { Item } from "./item";
 
+import * as express from "express";
+import { Response } from "express";
+
+import * as bodyParser from "body-parser";
+
+const app = express();
+
 const db = new nedb({ filename: "./data.db", autoload: true });
 let hn = new HackerNewsApi();
 
-doWork();
+app.use(bodyParser.json());
+app.get("/*", (req, res) => {
+  console.log("site is running");
+
+  var results = doWork().then(results => {
+    res.send(results);
+  });
+});
 
 function outputItem(item: Item, indent: number) {
   console.log("\t".repeat(indent) + item.text);

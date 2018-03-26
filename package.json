@@ -16,9 +16,12 @@
     "typescript": "^2.5.3"
   },
   "dependencies": {
+    "@types/express": "^4.11.1",
     "@types/firebase": "^3.2.1",
     "@types/nedb": "^1.8.5",
+    "express": "^4.16.3",
     "firebase": "^4.11.0",
+    "heroku-cli": "^6.15.39",
     "nedb": "^1.8.0"
   }
 }
