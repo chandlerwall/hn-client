@@ -6,7 +6,7 @@
   "scripts": {
     "server": "nodemon --watch '*.ts' --exec ts-node server.ts",
     "start": "node build/server.js",
-    "postinstall": "tsc"
+    "postinstall": "tsc && rm data.db"
   },
   "author": "",
   "license": "ISC",

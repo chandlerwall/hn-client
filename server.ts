@@ -21,6 +21,7 @@ app.use(bodyParser.json());
 interface TopStories {
   items: number[];
   id: "topstories";
+  lastUpdated: number; // UNIX timestamp in seconds
 }
 
 interface ItemExt extends Item {
@@ -81,10 +82,15 @@ app.get("/topstories", (req, res) => {
   db.findOne<TopStories>({ id: "topstories" }, (err, doc) => {
     console.log("err", err, "doc", doc);
 
-    if (doc === null) {
+    if (doc === null || _isTimePastThreshold(doc.lastUpdated)) {
       // go load top stories
+      console.log("updating the top stories");
       let topIds = _getTopStories().then(ids => {
-        let topstories: TopStories = { id: "topstories", items: ids };
+        let topstories: TopStories = {
+          id: "topstories",
+          items: ids,
+          lastUpdated: _getUnixTimestamp()
+        };
         db.insert(topstories);
 
         // process first layer and then return that obj
@@ -98,8 +104,10 @@ app.get("/topstories", (req, res) => {
         });
       });
     } else {
+      // do a check here to see how recent the topstories are
+
       // return those top stories as a clean object
-      _loadFirstLayerOfInfo(doc.items.slice(0, 10)).then(allObj => {
+      _loadFirstLayerOfInfo(doc.items.slice(0, 30)).then(allObj => {
         console.log("all objects loaded...");
         res.json(allObj);
       });
@@ -109,6 +117,15 @@ app.get("/topstories", (req, res) => {
 
 interface ItemParams {
   id: number;
+}
+
+function _isTimePastThreshold(timestamp: number) {
+  // set to 10 minutes = 600 seconds for now
+  return _getUnixTimestamp() - timestamp > 600;
+}
+
+function _getUnixTimestamp() {
+  return Math.floor(new Date().valueOf() / 1000);
 }
 
 app.get("/item/:id", (req, res) => {
