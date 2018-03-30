@@ -98,7 +98,7 @@ app.get("/topstories", (req, res) => {
         // TODO: split ths out so it works on a second call
 
         // TODO: load the first layer of info for those stories
-        _loadFirstLayerOfInfo(ids.slice(0, 10)).then(allObj => {
+        _loadFirstLayerOfInfo(ids.slice(0, 30)).then(allObj => {
           console.log("all objects loaded...");
           res.json(allObj);
         });
