@@ -91,7 +91,16 @@ app.get("/topstories", (req, res) => {
           items: ids,
           lastUpdated: _getUnixTimestamp()
         };
-        db.insert(topstories);
+
+        // this will update or insert the new topstories
+        db.update(
+          { id: topstories.id },
+          { topstories },
+          { upsert: true },
+          (err, numUpdated, upsert) => {
+            console.log("topstories upsert", err, numUpdated, upsert);
+          }
+        );
 
         // process first layer and then return that obj
 
