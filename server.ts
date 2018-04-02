@@ -73,6 +73,13 @@ async function _loadFirstLayerOfInfo(ids: number[]) {
   // return a obj with all of the first layer info for these?
 }
 
+async function _getTopStoriesOffline(){
+  // this will return a single array of stories, with all comments fully populated
+  // will start with 3 stories for simplicity
+
+
+}
+
 app.get("/topstories", (req, res) => {
   // return a set of 30 stories with the titel, comment count, and URL
   // add those to the DB and set some flag saying that they need full details loaded
@@ -130,6 +137,7 @@ interface ItemParams {
 
 function _isTimePastThreshold(timestamp: number) {
   // set to 10 minutes = 600 seconds for now
+  // TODO: turn this into a constant
   return _getUnixTimestamp() - timestamp > 600;
 }
 
@@ -162,10 +170,17 @@ app.get("/item/:id", (req, res) => {
   res.send("it went through");
 });
 
+app.get("/top_offline", (req, res)=>{
+  // get the results for the best 10
+  var results = doWork(10).then(results => {
+    res.json(results);
+  });
+})
+
 app.get("/*", (req, res) => {
   console.log("site is running");
 
-  var results = doWork().then(results => {
+  var results = doWork(2).then(results => {
     res.send(results);
   });
 });
@@ -182,12 +197,13 @@ async function _getTopStories() {
   return await hn.fetchItemIds("topstories");
 }
 
-async function doWork() {
+async function doWork(count: number) {
   // gets the front page of HN
   let itemIDs = await hn.fetchItemIds("topstories");
 
   // this slice just avoid extra calls for now
-  itemIDs = itemIDs.slice(0, 2);
+  // TODO: add bounds on count
+  itemIDs = itemIDs.slice(0, count);
 
   // takes those items and grab the details for it
   let items = await hn.fetchItems(itemIDs);
