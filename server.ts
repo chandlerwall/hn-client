@@ -73,11 +73,9 @@ async function _loadFirstLayerOfInfo(ids: number[]) {
   // return a obj with all of the first layer info for these?
 }
 
-async function _getTopStoriesOffline(){
+async function _getTopStoriesOffline() {
   // this will return a single array of stories, with all comments fully populated
   // will start with 3 stories for simplicity
-
-
 }
 
 app.get("/topstories", (req, res) => {
@@ -170,12 +168,12 @@ app.get("/item/:id", (req, res) => {
   res.send("it went through");
 });
 
-app.get("/top_offline", (req, res)=>{
+app.get("/top_offline", (req, res) => {
   // get the results for the best 10
   var results = doWork(10).then(results => {
     res.json(results);
   });
-})
+});
 
 app.get("/*", (req, res) => {
   console.log("site is running");
@@ -186,6 +184,9 @@ app.get("/*", (req, res) => {
 });
 
 function outputItem(item: Item, indent: number) {
+  if (item === null) {
+    return;
+  }
   console.log("\t".repeat(indent) + item.text);
 
   if (item.kidsObj !== undefined) {
@@ -197,6 +198,20 @@ async function _getTopStories() {
   return await hn.fetchItemIds("topstories");
 }
 
+async function getItemFromDb(itemId: number): Promise<ItemExt> {
+  return new Promise<ItemExt>((resolve, reject) => {
+    console.log("find one: ", itemId);
+    db.findOne<ItemExt>({ id: itemId }, (err, doc) => {
+      if (err !== null) {
+        console.log("error, find one: ", err);
+        reject(err);
+      } else {
+        resolve(doc);
+      }
+    });
+  });
+}
+
 async function doWork(count: number) {
   // gets the front page of HN
   let itemIDs = await hn.fetchItemIds("topstories");
@@ -204,16 +219,54 @@ async function doWork(count: number) {
   // this slice just avoid extra calls for now
   // TODO: add bounds on count
   itemIDs = itemIDs.slice(0, count);
+  console.log(itemIDs);
 
-  // takes those items and grab the details for it
-  let items = await hn.fetchItems(itemIDs);
-  await addAllChildren(items);
+  // get the IDs, some of which are null
+  let itemObjs = await Promise.all(itemIDs.map(getItemFromDb));
 
-  for (let item of items) {
-    await addItemToDb(item);
+  console.log(itemObjs);
+
+  let newPromises = [];
+
+  for (var i = 0; i < itemObjs.length; i++) {
+    let obj = itemObjs[i];
+
+    /// TODO: add a check to the data updated
+    if (obj === null) {
+      let item = await hn.fetchItem(itemIDs[i]);
+      await addChildrenToItemRecurse(item);
+      await addItemToDb(item);
+
+      itemObjs[i] = item;
+    }
   }
 
-  return items;
+  await Promise.all(newPromises);
+
+  return itemObjs;
+}
+
+async function addChildrenToItemRecurse(item: Item) {
+  console.log("starting addAllChildren");
+  var newItems: Item[] = [];
+
+  // this now needs to go grab comments if they are desired
+  // TODO: consider building a giant normalized list and then doing a final denorm step... that final obj coudl be saved too as a cache.
+
+  let freshItems = await addChildrenToItem(item);
+
+  newItems = newItems.concat(freshItems);
+
+  // all of the kids were added... check if more kids to do
+
+  console.log("new items", newItems.map(item => item.id));
+
+  if (newItems.length == 0) {
+    console.log("ending addAllChildren");
+    return true;
+  } else {
+    return addAllChildren(newItems);
+  }
 }
 
 async function addAllChildren(items: Item[]) {
@@ -224,9 +277,11 @@ async function addAllChildren(items: Item[]) {
     // this now needs to go grab comments if they are desired
     // TODO: consider building a giant normalized list and then doing a final denorm step... that final obj coudl be saved too as a cache.
 
-    let freshItems = await addChildrenToItem(item);
-
-    newItems = newItems.concat(freshItems);
+    if (item !== null) {
+      let freshItems = await addChildrenToItem(item);
+      freshItems = freshItems.filter(item => item !== null);
+      newItems = newItems.concat(freshItems);
+    }
 
     // all of the kids were added... check if more kids to do
   }
@@ -242,8 +297,6 @@ async function addAllChildren(items: Item[]) {
 }
 
 async function addChildrenToItem(item: Item): Promise<Item[]> {
-  console.log("entering addChildren");
-
   if (item.kids !== undefined && item.kids.length > 0) {
     return Promise.all(item.kids.map(kid => hn.fetchItem(kid))).then(result => {
       // result contains all of the comments loaded, run them back into the parent
@@ -262,11 +315,11 @@ async function addItemToDb(item: Item) {
   outputItem(item, 0);
 
   return new Promise((resolve, reject) => {
-    db.insert({ item }, (err, newDoc) => {
+    db.update({ id: item.id }, item, { upsert: true }, (err, numCount) => {
       if (err) {
         reject(err);
       } else {
-        resolve(newDoc);
+        resolve(true);
       }
     });
   });
