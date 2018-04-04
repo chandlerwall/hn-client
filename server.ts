@@ -44,12 +44,11 @@ async function _loadFirstLayerOfInfo(ids: number[]) {
           // need to load that object
 
           let newItem = hn.fetchItem(id).then(item => {
-            console.log("item is here!", item);
             let itemExt = item as ItemExt;
             itemExt.firstLayerOnly = true;
 
             // TODO: fully implement the callback here
-            console.log("adding obj to DB");
+
             db.insert(itemExt, (err, doc) => {
               if (err != null) {
                 reject(err);
@@ -59,7 +58,6 @@ async function _loadFirstLayerOfInfo(ids: number[]) {
             });
           });
         } else {
-          console.log("obj was in DB");
           resolve(doc);
         }
       });
@@ -67,7 +65,6 @@ async function _loadFirstLayerOfInfo(ids: number[]) {
     promises.push(reqProm);
   });
 
-  console.log("waiting for all requests to come through");
   return await Promise.all(promises);
 
   // return a obj with all of the first layer info for these?
@@ -85,7 +82,7 @@ app.get("/topstories", (req, res) => {
   // store those top stories for some period of time
 
   db.findOne<TopStories>({ id: "topstories" }, (err, doc) => {
-    console.log("err", err, "doc", doc);
+    // console.log("err", err, "doc", doc);
 
     if (doc === null || _isTimePastThreshold(doc.lastUpdated)) {
       // go load top stories
@@ -219,12 +216,9 @@ async function doWork(count: number) {
   // this slice just avoid extra calls for now
   // TODO: add bounds on count
   itemIDs = itemIDs.slice(0, count);
-  console.log(itemIDs);
 
   // get the IDs, some of which are null
   let itemObjs = await Promise.all(itemIDs.map(getItemFromDb));
-
-  console.log(itemObjs);
 
   let newPromises = [];
 
@@ -247,7 +241,6 @@ async function doWork(count: number) {
 }
 
 async function addChildrenToItemRecurse(item: Item) {
-  console.log("starting addAllChildren");
   var newItems: Item[] = [];
 
   // this now needs to go grab comments if they are desired
@@ -259,10 +252,9 @@ async function addChildrenToItemRecurse(item: Item) {
 
   // all of the kids were added... check if more kids to do
 
-  console.log("new items", newItems.map(item => item.id));
+  // console.log("new items", newItems.map(item => item.id));
 
   if (newItems.length == 0) {
-    console.log("ending addAllChildren");
     return true;
   } else {
     return addAllChildren(newItems);
@@ -270,7 +262,6 @@ async function addChildrenToItemRecurse(item: Item) {
 }
 
 async function addAllChildren(items: Item[]) {
-  console.log("starting addAllChildren");
   var newItems: Item[] = [];
 
   for (let item of items) {
@@ -286,10 +277,9 @@ async function addAllChildren(items: Item[]) {
     // all of the kids were added... check if more kids to do
   }
 
-  console.log("new items", newItems.map(item => item.id));
+  // console.log("new items", newItems.map(item => item.id));
 
   if (newItems.length == 0) {
-    console.log("ending addAllChildren");
     return true;
   } else {
     return addAllChildren(newItems);
@@ -312,7 +302,7 @@ async function addChildrenToItem(item: Item): Promise<Item[]> {
 }
 
 async function addItemToDb(item: Item) {
-  outputItem(item, 0);
+  // outputItem(item, 0);
 
   return new Promise((resolve, reject) => {
     db.update({ id: item.id }, item, { upsert: true }, (err, numCount) => {
