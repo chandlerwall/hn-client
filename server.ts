@@ -6,10 +6,12 @@ import * as express from "express";
 import { Response } from "express";
 
 import * as bodyParser from "body-parser";
+import * as compression from "compression";
 
 const app = express();
 
 const db = new nedb({ filename: "./data.db", autoload: true });
+
 let hn = new HackerNewsApi();
 
 db.ensureIndex({ fieldName: "id", unique: true }, function(err) {
@@ -17,10 +19,11 @@ db.ensureIndex({ fieldName: "id", unique: true }, function(err) {
 });
 
 app.use(bodyParser.json());
+app.use(compression());
 
 interface TopStories {
   items: number[];
-  id: "topstories";
+  id: TopStoriesType;
   lastUpdated: number; // UNIX timestamp in seconds
 }
 
@@ -51,14 +54,14 @@ async function _loadFirstLayerOfInfo(ids: number[]) {
 
             db.insert(itemExt, (err, doc) => {
               if (err != null) {
-                reject(err);
+                return reject(err);
               } else {
-                resolve(doc);
+                return resolve(doc);
               }
             });
           });
         } else {
-          resolve(doc);
+          return resolve(doc);
         }
       });
     });
@@ -75,56 +78,76 @@ async function _getTopStoriesOffline() {
   // will start with 3 stories for simplicity
 }
 
-app.get("/topstories", (req, res) => {
+interface TopStoriesParams {
+  type: TopStoriesType;
+}
+
+type TopStoriesType = "topstories" | "day" | "week" | "month" | "";
+
+app.get("/topstories/:type", (req, res) => {
   // return a set of 30 stories with the titel, comment count, and URL
   // add those to the DB and set some flag saying that they need full details loaded
   // load the first layer and note that more could be loaded
   // store those top stories for some period of time
 
-  db.findOne<TopStories>({ id: "topstories" }, (err, doc) => {
-    // console.log("err", err, "doc", doc);
+  let params: TopStoriesParams = req.params;
+  let reqType = params.type === "" ? "topstories" : params.type;
 
-    if (doc === null || _isTimePastThreshold(doc.lastUpdated)) {
-      // go load top stories
+  console.log(reqType);
+
+  db_getTopStoryIds(reqType).then(ids => {
+    console.log("ids to search", ids);
+    _getFullDataForIds(ids).then(results => {
+      console.log("repsonse ready... sending back");
+      res.json(results);
+    });
+  });
+
+  // find that type...
+});
+
+async function db_getTopStoryIds(reqType: TopStoriesType) {
+  return new Promise<number[]>((resolve, reject) => {
+    db.findOne<TopStories>({ id: reqType }, (err, doc) => {
+      if (err !== null) {
+        return reject(err);
+      }
+
+      console.log("group earch", doc);
+
+      if (doc !== null) {
+        console.log("doc exists");
+        if (!_isTimePastThreshold(doc.lastUpdated)) {
+          console.log("time is good");
+          return resolve(doc.items);
+        }
+      }
+
       console.log("updating the top stories");
-      let topIds = _getTopStories().then(ids => {
+
+      _getTopStories(reqType).then(ids => {
         let topstories: TopStories = {
-          id: "topstories",
+          id: reqType,
           items: ids,
           lastUpdated: _getUnixTimestamp()
         };
 
+        console.log("new top stories", topstories);
+
         // this will update or insert the new topstories
         db.update(
           { id: topstories.id },
-          { topstories },
+          topstories,
           { upsert: true },
           (err, numUpdated, upsert) => {
             console.log("topstories upsert", err, numUpdated, upsert);
+            return resolve(ids);
           }
         );
-
-        // process first layer and then return that obj
-
-        // TODO: split ths out so it works on a second call
-
-        // TODO: load the first layer of info for those stories
-        _loadFirstLayerOfInfo(ids.slice(0, 30)).then(allObj => {
-          console.log("all objects loaded...");
-          res.json(allObj);
-        });
       });
-    } else {
-      // do a check here to see how recent the topstories are
-
-      // return those top stories as a clean object
-      _loadFirstLayerOfInfo(doc.items.slice(0, 30)).then(allObj => {
-        console.log("all objects loaded...");
-        res.json(allObj);
-      });
-    }
+    });
   });
-});
+}
 
 interface ItemParams {
   id: number;
@@ -140,59 +163,20 @@ function _getUnixTimestamp() {
   return Math.floor(new Date().valueOf() / 1000);
 }
 
-app.get("/item/:id", (req, res) => {
-  // this will return a fully loaded object to be parsed by the app
-  console.log(req.query);
-  console.log(req.params);
-
-  let params: ItemParams = req.params;
-
-  let testId = params.id;
-  // check if the database contains the items
-  db.findOne({ id: testId }, (err, doc) => {
-    console.log("error", err, "doc", doc);
-
-    if (doc === null) {
-      console.log("none was found");
-
-      // go get the document loaded
-    }
-  });
-
-  // if not, go fetch the full item from HN API
-
-  // return the result
-  res.send("it went through");
-});
-
-app.get("/top_offline", (req, res) => {
-  // get the results for the best 10
-  var results = doWork(10).then(results => {
-    res.json(results);
-  });
-});
-
-app.get("/*", (req, res) => {
-  console.log("site is running");
-
-  var results = doWork(2).then(results => {
-    res.send(results);
-  });
-});
-
-function outputItem(item: Item, indent: number) {
-  if (item === null) {
-    return;
+async function _getTopStories(type: TopStoriesType) {
+  switch (type) {
+    case "topstories":
+      return await hn.fetchItemIds("topstories");
+    case "day":
+      return await AlgoliaApi.getDay();
+    case "month":
+      return await AlgoliaApi.getMonth();
+    case "week":
+      return await AlgoliaApi.getWeek();
+    default:
+      console.log("error missing type");
+      break;
   }
-  console.log("\t".repeat(indent) + item.text);
-
-  if (item.kidsObj !== undefined) {
-    item.kidsObj.forEach(kid => outputItem(kid, indent + 1));
-  }
-}
-
-async function _getTopStories() {
-  return await hn.fetchItemIds("topstories");
 }
 
 async function getItemFromDb(itemId: number): Promise<ItemExt> {
@@ -201,9 +185,9 @@ async function getItemFromDb(itemId: number): Promise<ItemExt> {
     db.findOne<ItemExt>({ id: itemId }, (err, doc) => {
       if (err !== null) {
         console.log("error, find one: ", err);
-        reject(err);
+        return reject(err);
       } else {
-        resolve(doc);
+        return resolve(doc);
       }
     });
   });
@@ -218,15 +202,21 @@ async function doWork(count: number) {
   itemIDs = itemIDs.slice(0, count);
 
   // get the IDs, some of which are null
-  let itemObjs = await Promise.all(itemIDs.map(getItemFromDb));
+  let itemObjs = _getFullDataForIds(itemIDs);
 
-  let newPromises = [];
+  return itemObjs;
+}
+
+async function _getFullDataForIds(itemIDs: number[]) {
+  let itemObjs = await Promise.all(itemIDs.map(getItemFromDb));
 
   for (var i = 0; i < itemObjs.length; i++) {
     let obj = itemObjs[i];
 
     /// TODO: add a check to the data updated
     if (obj === null) {
+      console.log("id was null, going for an update", itemIDs[i]);
+
       let item = await hn.fetchItem(itemIDs[i]);
       await addChildrenToItemRecurse(item);
       await addItemToDb(item);
@@ -234,8 +224,6 @@ async function doWork(count: number) {
       itemObjs[i] = item;
     }
   }
-
-  await Promise.all(newPromises);
 
   return itemObjs;
 }
@@ -307,9 +295,10 @@ async function addItemToDb(item: Item) {
   return new Promise((resolve, reject) => {
     db.update({ id: item.id }, item, { upsert: true }, (err, numCount) => {
       if (err) {
-        reject(err);
+        return reject(err);
       } else {
-        resolve(true);
+        console.log("item added to DB: ", item.id);
+        return resolve(true);
       }
     });
   });
@@ -319,3 +308,61 @@ var port = process.env.PORT || 3000;
 app.listen(port);
 
 console.log("server is running on port: " + port);
+
+import * as rp from "request-promise";
+
+class AlgoliaApi {
+  static async getDay() {
+    let timestamp = _getUnixTimestamp() - 60 * 60 * 24;
+
+    var options = {
+      uri:
+        "https://hn.algolia.com/api/v1/search?tags=story&numericFilters=created_at_i>" +
+        timestamp,
+
+      json: true
+    };
+
+    let results = await rp(options);
+
+    // these will be strings not numbers at first
+    // note the object is .hits for the main data
+    return results.hits.map(result => Number.parseInt(result.objectID));
+  }
+
+  static async getWeek() {
+    let timestamp = _getUnixTimestamp() - 60 * 60 * 24 * 7;
+
+    var options = {
+      uri:
+        "https://hn.algolia.com/api/v1/search?tags=story&numericFilters=created_at_i>" +
+        timestamp,
+
+      json: true
+    };
+
+    let results = await rp(options);
+
+    // these will be strings not numbers at first
+    // note the object is .hits for the main data
+    return results.hits.map(result => Number.parseInt(result.objectID));
+  }
+
+  static async getMonth() {
+    let timestamp = _getUnixTimestamp() - 60 * 60 * 24 * 7 * 30;
+
+    var options = {
+      uri:
+        "https://hn.algolia.com/api/v1/search?tags=story&numericFilters=created_at_i>" +
+        timestamp,
+
+      json: true
+    };
+
+    let results = await rp(options);
+
+    // these will be strings not numbers at first
+    // note the object is .hits for the main data
+    return results.hits.map(result => Number.parseInt(result.objectID));
+  }
+}

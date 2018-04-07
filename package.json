@@ -12,17 +12,20 @@
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^8.0.47",
+    "heroku-cli": "^6.15.39",
     "nodemon": "^1.17.2",
     "ts-node": "^3.3.0",
-    "typescript": "^2.5.3",
-    "heroku-cli": "^6.15.39"
+    "typescript": "^2.5.3"
   },
   "dependencies": {
     "@types/express": "^4.11.1",
     "@types/firebase": "^3.2.1",
     "@types/nedb": "^1.8.5",
+    "@types/request-promise": "^4.1.41",
+    "compression": "^1.7.2",
     "express": "^4.16.3",
     "firebase": "^4.11.0",
-    "nedb": "^1.8.0"
+    "nedb": "^1.8.0",
+    "request-promise": "^4.2.2"
   }
 }
