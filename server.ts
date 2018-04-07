@@ -166,7 +166,7 @@ function _getUnixTimestamp() {
 async function _getTopStories(type: TopStoriesType) {
   switch (type) {
     case "topstories":
-      return await hn.fetchItemIds("topstories");
+      return (await hn.fetchItemIds("topstories")).slice(0, 20);
     case "day":
       return await AlgoliaApi.getDay();
     case "month":
