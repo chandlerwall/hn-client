@@ -193,20 +193,6 @@ async function getItemFromDb(itemId: number): Promise<ItemExt> {
   });
 }
 
-async function doWork(count: number) {
-  // gets the front page of HN
-  let itemIDs = await hn.fetchItemIds("topstories");
-
-  // this slice just avoid extra calls for now
-  // TODO: add bounds on count
-  itemIDs = itemIDs.slice(0, count);
-
-  // get the IDs, some of which are null
-  let itemObjs = _getFullDataForIds(itemIDs);
-
-  return itemObjs;
-}
-
 async function _getFullDataForIds(itemIDs: number[]) {
   let itemObjs = await Promise.all(itemIDs.map(getItemFromDb));
 
