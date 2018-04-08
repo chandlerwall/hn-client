@@ -21,13 +21,16 @@ db.ensureIndex({ fieldName: "id", unique: true }, function(err) {
 app.use(bodyParser.json());
 app.use(compression());
 
-interface TopStories {
-  items: number[];
-  id: TopStoriesType;
+interface HasTime {
   lastUpdated: number; // UNIX timestamp in seconds
 }
 
-interface ItemExt extends Item {
+interface TopStories extends HasTime {
+  items: number[];
+  id: TopStoriesType;
+}
+
+interface ItemExt extends Item, HasTime {
   firstLayerOnly?: boolean;
 }
 
@@ -82,7 +85,7 @@ interface TopStoriesParams {
   type: TopStoriesType;
 }
 
-type TopStoriesType = "topstories" | "day" | "week" | "month" | "";
+type TopStoriesType = "topstories" | "day" | "week" | "month";
 
 app.get("/topstories/:type", (req, res) => {
   // return a set of 30 stories with the titel, comment count, and URL
@@ -91,7 +94,7 @@ app.get("/topstories/:type", (req, res) => {
   // store those top stories for some period of time
 
   let params: TopStoriesParams = req.params;
-  let reqType = params.type === "" ? "topstories" : params.type;
+  let reqType = params.type;
 
   console.log(reqType);
 
@@ -117,7 +120,7 @@ async function db_getTopStoryIds(reqType: TopStoriesType) {
 
       if (doc !== null) {
         console.log("doc exists");
-        if (!_isTimePastThreshold(doc.lastUpdated)) {
+        if (!_isTimePastThreshold(doc)) {
           console.log("time is good");
           return resolve(doc.items);
         }
@@ -153,7 +156,15 @@ interface ItemParams {
   id: number;
 }
 
-function _isTimePastThreshold(timestamp: number) {
+function _isTimePastThreshold(itemExt: HasTime) {
+  if (itemExt.lastUpdated === undefined) {
+    return true;
+  }
+
+  return __isTimePastThreshold(itemExt.lastUpdated);
+}
+
+function __isTimePastThreshold(timestamp: number) {
   // set to 10 minutes = 600 seconds for now
   // TODO: turn this into a constant
   return _getUnixTimestamp() - timestamp > 600;
@@ -187,7 +198,11 @@ async function getItemFromDb(itemId: number): Promise<ItemExt> {
         console.log("error, find one: ", err);
         return reject(err);
       } else {
-        return resolve(doc);
+        if (doc === null || _isTimePastThreshold(doc)) {
+          return resolve(null);
+        } else {
+          return resolve(doc);
+        }
       }
     });
   });
@@ -207,7 +222,7 @@ async function _getFullDataForIds(itemIDs: number[]) {
       await addChildrenToItemRecurse(item);
       await addItemToDb(item);
 
-      itemObjs[i] = item;
+      itemObjs[i] = { ...item, lastUpdated: _getUnixTimestamp() };
     }
   }
 
@@ -278,8 +293,10 @@ async function addChildrenToItem(item: Item): Promise<Item[]> {
 async function addItemToDb(item: Item) {
   // outputItem(item, 0);
 
+  let itemExt: ItemExt = { ...item, lastUpdated: _getUnixTimestamp() };
+
   return new Promise((resolve, reject) => {
-    db.update({ id: item.id }, item, { upsert: true }, (err, numCount) => {
+    db.update({ id: item.id }, itemExt, { upsert: true }, (err, numCount) => {
       if (err) {
         return reject(err);
       } else {
