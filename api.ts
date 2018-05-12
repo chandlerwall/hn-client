@@ -10,10 +10,23 @@ const API_VERSION = "/v0";
 export const STORIES_PER_PAGE = 25;
 
 export class HackerNewsApi {
-  private readonly db = firebase
-    .initializeApp({ databaseURL: API_URL })
-    .database()
-    .ref(API_VERSION);
+  constructor() {
+    console.log("api constructor called");
+    this.db = firebase
+      .initializeApp({ databaseURL: API_URL })
+      .database()
+      .ref(API_VERSION);
+  }
+  private db;
+
+  static _instance: HackerNewsApi;
+  static get() {
+    if (HackerNewsApi._instance === undefined) {
+      HackerNewsApi._instance = new HackerNewsApi();
+    }
+
+    return HackerNewsApi._instance;
+  }
 
   fetchItemsOnPage(items: number[], page: number): Promise<Item[]> {
     let start = (page - 1) * STORIES_PER_PAGE;

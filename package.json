@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "server": "nodemon --watch '*.ts' --exec ts-node server.ts",
-    "start": "node build/server.js",
+    "server": "nodemon --watch '*.ts' --exec ts-node index.ts",
+    "start": "node build/index.js",
     "postinstall": "tsc"
   },
   "author": "",
