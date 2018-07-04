@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "server": "nodemon --watch '*.ts' --exec ts-node index.ts",
-    "start": "node build/index.js",
-    "postinstall": "tsc"
+    "start": "node build/index.js"
   },
   "author": "",
   "license": "ISC",

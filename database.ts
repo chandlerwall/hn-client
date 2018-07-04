@@ -9,7 +9,7 @@ export class Database {
   static _db: Nedb;
   static get() {
     if (Database._db === undefined) {
-      Database._db = new nedb({ filename: "./data.db", autoload: true });
+      Database._db = new nedb({ filename: "./data_test.db", autoload: true });
       Database._db.ensureIndex({ fieldName: "id", unique: true }, function(
         err
       ) {
@@ -32,11 +32,14 @@ export async function db_getTopStoryIds(reqType: TopStoriesType) {
 
       if (doc !== null) {
         console.log("doc exists");
-        if (!_isTimePastThreshold(doc)) {
+        const shouldUpdate = _getUnixTimestamp() - doc.lastUpdated > 600;
+        if (!shouldUpdate) {
           console.log("time is good");
           return resolve(doc.items);
         }
       }
+
+      // TODO: add a second check here to determine when to reload
 
       console.log("updating the top stories");
 
@@ -207,16 +210,15 @@ async function addChildrenToItemRecurse(item: Item) {
   }
 }
 
-function _isTimePastThreshold(itemExt: HasTime) {
+function _isTimePastThreshold(itemExt: ItemExt) {
   if (itemExt.lastUpdated === undefined) {
     return true;
   }
 
-  return __isTimePastThreshold(itemExt.lastUpdated);
-}
-
-function __isTimePastThreshold(timestamp: number) {
-  // set to 10 minutes = 600 seconds for now
-  // TODO: turn this into a constant
-  return _getUnixTimestamp() - timestamp > 600;
+  // set up to update the story if the ratio on time marks the story old
+  return (
+    (_getUnixTimestamp() - itemExt.lastUpdated) /
+      (itemExt.lastUpdated - itemExt.time) >
+    0.25
+  );
 }
