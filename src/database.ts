@@ -1,8 +1,9 @@
 import * as nedb from "nedb";
+
 import { AlgoliaApi } from "./algolia";
 import { HackerNewsApi } from "./api";
 import { _getUnixTimestamp } from "./helpers";
-import { HasTime, ItemExt, TopStories, TopStoriesType } from "./interfaces";
+import { ItemExt, TopStories, TopStoriesType } from "./interfaces";
 import { Item } from "./item";
 
 export class Database {

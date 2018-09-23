@@ -1,7 +1,7 @@
 import * as bodyParser from "body-parser";
 import * as compression from "compression";
 import * as express from "express";
-import { HackerNewsApi } from "./api";
+
 import { _getFullDataForIds, db_getTopStoryIds } from "./database";
 import { TopStoriesParams } from "./interfaces";
 

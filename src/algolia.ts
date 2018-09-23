@@ -1,5 +1,6 @@
-import { _getUnixTimestamp } from "./helpers";
 import * as rp from "request-promise";
+
+import { _getUnixTimestamp } from "./helpers";
 
 export class AlgoliaApi {
   static async getDay() {
