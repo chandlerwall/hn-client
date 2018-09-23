@@ -9,11 +9,14 @@ export class Database {
   static _db: Nedb;
   static get() {
     if (Database._db === undefined) {
+      console.log("creating DB");
       Database._db = new nedb({ filename: "./data_test.db", autoload: true });
       Database._db.ensureIndex({ fieldName: "id", unique: true }, function(
         err
       ) {
-        console.log("nedb unique error", err);
+        if (err !== null) {
+          console.log("nedb unique error", err);
+        }
       });
     }
 
@@ -23,13 +26,14 @@ export class Database {
 
 export async function db_getTopStoryIds(reqType: TopStoriesType) {
   return new Promise<number[]>((resolve, reject) => {
+    console.log("searching DB for topstories");
     Database.get().findOne<TopStories>({ id: reqType }, (err, doc) => {
       if (err !== null) {
         console.log("error occurred fetching ids", err);
         return reject(err);
       }
 
-      console.log("group earch", doc);
+      console.log("group search", doc);
 
       if (doc !== null) {
         console.log("doc exists");
