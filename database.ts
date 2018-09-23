@@ -25,6 +25,7 @@ export async function db_getTopStoryIds(reqType: TopStoriesType) {
   return new Promise<number[]>((resolve, reject) => {
     Database.get().findOne<TopStories>({ id: reqType }, (err, doc) => {
       if (err !== null) {
+        console.log("error occurred fetching ids", err);
         return reject(err);
       }
 
