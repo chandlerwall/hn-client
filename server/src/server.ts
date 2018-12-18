@@ -34,7 +34,7 @@ export class Server {
       // find that type...
     });
 
-    var port = process.env.PORT || 3000;
+    var port = process.env.PORT || 3001;
     app.listen(port);
 
     console.log("server is running on port: " + port);
