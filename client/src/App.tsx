@@ -69,7 +69,9 @@ export class App extends React.Component<AppProps, AppState> {
     if (isActive) {
       this.setState({ items });
     }
-    
+
+    // this is needed to ensure that state updates are atomic
+    // all new items need to be joined together... cannot skip updatesÍ
     this.setState(prevState => {
       let allItems = _.cloneDeep(prevState.allItems).concat(items);
       allItems = _.uniqBy(allItems, c => c.id);

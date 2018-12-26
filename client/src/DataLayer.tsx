@@ -32,6 +32,7 @@ export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
   }
 
   render() {
+    // TODO: generalize the comps and events for the data type (don't duplicate)
     return (
       <React.Fragment>
         <LocalStorageWrapper<HnItem[]>
