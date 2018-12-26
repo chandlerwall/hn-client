@@ -1,0 +1,9 @@
+body {
+  width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.bp3-card {
+  padding: 5px;
+}

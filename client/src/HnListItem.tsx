@@ -1,10 +1,11 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
-interface HnStoryProps {
+export interface HnStoryProps {
   data: HnItem;
 }
 
-export class HnStory extends React.Component<HnStoryProps> {
+export class HnListItem extends React.Component<HnStoryProps> {
   render() {
     const story = this.props.data;
     return (
@@ -14,9 +15,9 @@ export class HnStory extends React.Component<HnStoryProps> {
         </p>
         <p>
           <span>{story.score + " | "}</span>
-          <a href={"https://news.ycombinator.com/item?id=" + story.id}>
+          <Link to={"/story/" + story.id}>
             <span>{story.descendants}</span>
-          </a>
+          </Link>
           <span>{" | " + story.score}</span>
         </p>
       </div>
