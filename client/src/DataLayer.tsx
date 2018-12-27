@@ -203,18 +203,18 @@ export class LocalStorageWrapper<TDataType> extends React.Component<
   componentDidMount() {
     // check localStorage for obj
 
-    const itemCompr = localStorage.getItem(this.props.storageName);
+    const itemCompressed = localStorage.getItem(this.props.storageName);
 
     // decompress
 
-    if (itemCompr === undefined || itemCompr === null) {
+    if (itemCompressed === undefined || itemCompressed === null) {
       this.setState({ item: undefined }, () =>
         this.props.dataDidUpdate(undefined)
       );
       return;
     }
 
-    const item = LZString.decompress(itemCompr);
+    const item = LZString.decompress(itemCompressed);
     
 
     // parse JSON for what was found
@@ -247,8 +247,8 @@ export class LocalStorageWrapper<TDataType> extends React.Component<
       // compress and save
 
       const strToStore = JSON.stringify(this.props.activeItem);
-      const strToStoreCompr = LZString.compress(strToStore);
-      localStorage.setItem(this.props.storageName, strToStoreCompr);
+      const strToStoreCompressed = LZString.compress(strToStore);
+      localStorage.setItem(this.props.storageName, strToStoreCompressed);
 
       this.setState({ item: this.props.activeItem }, () =>
         this.props.dataDidUpdate(this.props.activeItem)

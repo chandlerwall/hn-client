@@ -15,7 +15,7 @@ export class Server {
     app.set("etag", false);
 
     app.get("/topstories/:type", (req, res) => {
-      // return a set of 30 stories with the titel, comment count, and URL
+      // return a set of 30 stories with the title, comment count, and URL
       // add those to the DB and set some flag saying that they need full details loaded
       // load the first layer and note that more could be loaded
       // store those top stories for some period of time
@@ -28,7 +28,7 @@ export class Server {
       db_getTopStoryIds(reqType).then(ids => {
         console.log("ids to search", ids);
         _getFullDataForIds(ids).then(results => {
-          console.log("repsonse ready... sending back");
+          console.log("response ready... sending back");
           res.json(results);
         });
       });
