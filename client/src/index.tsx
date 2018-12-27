@@ -2,14 +2,16 @@ import "@blueprintjs/core/lib/css/blueprint.css";
 
 import React from "react";
 import ReactDOM from "react-dom";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Route } from "react-router-dom";
 
-import { AppRouter } from "./App";
+import { App } from "./App";
 import * as serviceWorker from "./serviceWorker";
 
 ReactDOM.render(
   <BrowserRouter>
-    <AppRouter />
+    <Route path={"/:page?"}>
+      <App />
+    </Route>
   </BrowserRouter>,
   document.getElementById("root")
 );

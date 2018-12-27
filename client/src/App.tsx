@@ -1,68 +1,58 @@
 import "./App.css";
 
-import React from "react";
-import { Route, RouteComponentProps, Switch } from "react-router";
+import _ from "lodash";
+import React, { RefObject } from "react";
+import { Route, RouteComponentProps, Switch, withRouter } from "react-router";
 
 import { DataLayer } from "./DataLayer";
 import { Header } from "./Header";
 import { HnStoryList } from "./HnStoryList";
 import { HnStoryPage } from "./HnStoryPage";
-import _ from "lodash";
 
-interface HomeRouterProps {
-  id: string; // This one is coming from the router
-}
+interface StoryPageProps extends RouteComponentProps<{ id: string }> {}
+interface AppPageProps extends RouteComponentProps<{ page?: string }> {}
 
-interface HomeProps extends RouteComponentProps<HomeRouterProps> {
-  // Add your regular properties here
-}
+class _App extends React.Component<AppPageProps, AppState> {
+  dataLayer: RefObject<DataLayer>;
 
-export class AppRouter extends React.Component {
-  render() {
-    const routes = [
-      { path: "/", source: HnListSource.Front },
-      { path: "/day", source: HnListSource.Day },
-      { path: "/week", source: HnListSource.Week },
-      { path: "/month", source: HnListSource.Month }
-    ];
-    return (
-      <Switch>
-        {routes.map(route => (
-          <Route
-            path={route.path}
-            exact
-            key={route.path}
-            render={() => <App activeList={route.source} storyId={undefined} />}
-          />
-        ))}
+  static getDerivedStateFromProps(props: AppPageProps, state: AppState) {
+    let listType: HnListSource;
+    switch (props.match.params.page) {
+      case "day":
+        listType = HnListSource.Day;
+        break;
 
-        <Route
-          path={"/story/:id"}
-          exact
-          render={(props: HomeProps) => (
-            <App activeList={undefined} storyId={+props.match.params.id} />
-          )}
-        />
-      </Switch>
-    );
+      case "week":
+        listType = HnListSource.Week;
+        break;
+
+      case "month":
+        listType = HnListSource.Month;
+        break;
+
+      default:
+        listType = HnListSource.Front;
+        break;
+    }
+
+    console.log("derived state", props.match.params.page, listType);
+
+    return { ...state, activeList: listType };
   }
-}
 
-interface AppProps {
-  activeList: HnListSource | undefined;
-  storyId: number | undefined;
-}
-
-export class App extends React.Component<AppProps, AppState> {
-  constructor(props: AppProps) {
+  constructor(props: AppPageProps) {
     super(props);
 
     this.state = {
       items: [],
-      allItems: []
+      allItems: [],
+      activeList: HnListSource.Front
     };
 
+    this.dataLayer = React.createRef();
+
     this.updateActiveDataStore = this.updateActiveDataStore.bind(this);
+    this.newItemsProvided = this.newItemsProvided.bind(this);
   }
 
   updateActiveDataStore(items: HnItem[], isActive: boolean) {
@@ -81,36 +71,65 @@ export class App extends React.Component<AppProps, AppState> {
   }
 
   render() {
-    console.log("app render", this.props.activeList);
-
-    console.log(
-      "active id",
-      this.props.storyId,
-      this.state.allItems.find(item => item.id === this.props.storyId)
-    );
-    const mainContent =
-      this.props.storyId === undefined ? (
-        <HnStoryList items={this.state.items} />
-      ) : (
-        <HnStoryPage
-          data={
-            this.state.allItems.find(item => item.id === this.props.storyId)!
-          }
-        />
-      );
+    console.log("render state", this.state);
     return (
       <div>
         <DataLayer
-          activeList={this.props.activeList}
-          dataSourceUpdated={this.updateActiveDataStore}
+          ref={this.dataLayer}
+          provideNewItems={this.newItemsProvided}
         />
 
         <Header />
-        {mainContent}
+
+        <Switch>
+          <Route
+            path={"/story/:id"}
+            exact
+            render={(props: StoryPageProps) => (
+              <HnStoryPage
+                data={
+                  this.dataLayer.current === null
+                    ? undefined
+                    : this.dataLayer.current.getStoryData(
+                        +props.match.params.id
+                      )
+                }
+              />
+            )}
+          />
+          <Route
+            path="/:page?"
+            render={(props: AppPageProps) => (
+              <HnStoryList
+                items={
+                  this.dataLayer.current === null
+                    ? []
+                    : this.dataLayer.current.getPageData(
+                        props.match.params.page
+                      )
+                }
+                requestNewData={() => {
+                  this.dataLayer.current!.updateNewItems(
+                    undefined,
+                    this.state.activeList
+                  );
+                  this.setState({ items: [] });
+                }}
+              />
+            )}
+          />
+        </Switch>
       </div>
     );
   }
+  newItemsProvided(items: HnItem[], listType: HnListSource): void {
+    if (listType === this.state.activeList) {
+      this.setState({ items });
+    }
+  }
 }
+
+export const App = withRouter(_App);
 
 export enum HnListSource {
   Front,
@@ -122,4 +141,6 @@ export enum HnListSource {
 interface AppState {
   items: HnItem[];
   allItems: HnItem[];
+
+  activeList: HnListSource;
 }

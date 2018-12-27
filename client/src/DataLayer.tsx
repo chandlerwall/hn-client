@@ -1,25 +1,27 @@
 import _ from "lodash";
 import React from "react";
+import LZString from "lz-string";
 
 import { HnListSource } from "./App";
 
 interface DataLayerState {
-  frontItems: HnItem[] | undefined;
+  frontItems: HnItem[];
 
-  dayItems: HnItem[] | undefined;
+  dayItems: HnItem[];
 
-  weekItems: HnItem[] | undefined;
+  weekItems: HnItem[];
 
-  monthItems: HnItem[] | undefined;
+  monthItems: HnItem[];
 }
 
 interface DataLayerProps {
-  activeList: HnListSource | undefined;
-
-  dataSourceUpdated(items: HnItem[] | undefined, isActive: boolean): void;
+  provideNewItems(items: HnItem[], listType: HnListSource): void;
 }
 
 export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
+  refreshData(activeList: HnListSource): void {
+    
+  }
   constructor(props: DataLayerProps) {
     super(props);
 
@@ -36,37 +38,79 @@ export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
     return (
       <React.Fragment>
         <LocalStorageWrapper<HnItem[]>
-          dataDidUpdate={item => this.updateFrontItems(item)}
+          dataDidUpdate={item => this.updateNewItems(item, HnListSource.Front)}
           activeItem={this.state.frontItems}
           storageName="HN-ITEMS"
         />
 
         <LocalStorageWrapper<HnItem[]>
-          dataDidUpdate={item => this.updateDayItems(item)}
+          dataDidUpdate={item => this.updateNewItems(item, HnListSource.Day)}
           activeItem={this.state.dayItems}
           storageName="HN-DAY-ITEMS"
+        />
+
+        <LocalStorageWrapper<HnItem[]>
+          dataDidUpdate={item => this.updateNewItems(item, HnListSource.Week)}
+          activeItem={this.state.weekItems}
+          storageName="HN-WEEK-ITEMS"
+        />
+
+        <LocalStorageWrapper<HnItem[]>
+          dataDidUpdate={item => this.updateNewItems(item, HnListSource.Month)}
+          activeItem={this.state.monthItems}
+          storageName="HN-MONTH-ITEMS"
         />
       </React.Fragment>
     );
   }
 
-  componentDidMount() {
-    console.log("did mount", this.state);
+  getStoryData(id: number) {
+    let item = this.state.frontItems.find(c => c.id === id);
+    if (item !== undefined) {
+      return item;
+    }
 
-    // TODO: this works when data is loaded... need to determine how to trigger new data needed
+    item = this.state.dayItems.find(c => c.id === id);
+    if (item !== undefined) {
+      return item;
+    }
+
+    item = this.state.weekItems.find(c => c.id === id);
+    if (item !== undefined) {
+      return item;
+    }
+
+    item = this.state.monthItems.find(c => c.id === id);
+    if (item !== undefined) {
+      return item;
+    }
+
+    return undefined;
   }
 
-  componentDidUpdate(props: DataLayerProps) {
-    console.log("new state", props);
-    if (props.activeList !== this.props.activeList) {
-      // change the data source... fire off events
-      // do the fetch here (if needed)... otherwise fire the event for the new data source
-
-      // TODO: check if data is already defined... force update somehow
-      console.log("should update data... loading");
-
-      this.updateDayItems(this.state.dayItems);
-      this.updateFrontItems(this.state.frontItems);
+  getPageData(page: string | undefined) {
+    // TODO: add loading step if data is missing -- figure out how to trigger refresh
+    switch (page) {
+      case "day":
+        if (this.state.dayItems.length === 0) {
+          this.loadData(HnListSource.Day);
+        }
+        return this.state.dayItems || [];
+      case "week":
+        if (this.state.weekItems.length === 0) {
+          this.loadData(HnListSource.Week);
+        }
+        return this.state.weekItems || [];
+      case "month":
+        if (this.state.monthItems.length === 0) {
+          this.loadData(HnListSource.Month);
+        }
+        return this.state.monthItems || [];
+      default:
+        if (this.state.frontItems.length === 0) {
+          this.loadData(HnListSource.Front);
+        }
+        return this.state.frontItems || [];
     }
   }
 
@@ -101,7 +145,17 @@ export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
 
     console.log("hn items", data);
 
-    switch (activeList) {
+    this.updateNewItems(data, activeList);
+  }
+
+  updateNewItems(data: HnItem[] | undefined, listType: HnListSource): void {
+    console.log("new items2 front", data, listType);
+
+    if (data === undefined) {
+      data = [];
+    }
+
+    switch (listType) {
       case HnListSource.Front:
         this.setState({ frontItems: data });
         break;
@@ -109,48 +163,20 @@ export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
         this.setState({ dayItems: data });
         break;
       case HnListSource.Week:
-        url = "/topstories/week";
+        this.setState({ weekItems: data });
         break;
       case HnListSource.Month:
-        url = "/topstories/month";
+        this.setState({ monthItems: data });
         break;
     }
-  }
 
-  updateFrontItems(items: HnItem[] | undefined): void {
-    console.log("new items2 front", items);
-    this.setState({ frontItems: items }, () => {
-      const isActive = this.props.activeList === HnListSource.Front;
-
-      if (items === undefined) {
-        // load data here
-        this.loadData(HnListSource.Front);
-        return;
-      }
-
-      this.props.dataSourceUpdated(items, isActive);
-    });
-  }
-
-  updateDayItems(items: HnItem[] | undefined): void {
-    console.log("new items2 day", items);
-    this.setState({ dayItems: items }, () => {
-      const isActive = this.props.activeList === HnListSource.Day;
-
-      if (items === undefined) {
-        // load data here
-        this.loadData(HnListSource.Day);
-        return;
-      }
-
-      this.props.dataSourceUpdated(items, isActive);
-    });
+    this.props.provideNewItems(data, listType);
   }
 }
 
 interface LocalStorageWrapperProps<TDataType> {
   storageName: string;
-  activeItem: TDataType | undefined;
+  activeItem: TDataType;
 
   dataDidUpdate(item: TDataType | undefined): void;
 }
@@ -176,16 +202,20 @@ export class LocalStorageWrapper<TDataType> extends React.Component<
 
   componentDidMount() {
     // check localStorage for obj
-    console.log("wrapper mounted", this.props.storageName);
-    const item = localStorage.getItem(this.props.storageName);
-    if (item === undefined || item === null) {
+
+    const itemCompr = localStorage.getItem(this.props.storageName);
+
+    // decompress
+
+    if (itemCompr === undefined || itemCompr === null) {
       this.setState({ item: undefined }, () =>
         this.props.dataDidUpdate(undefined)
       );
       return;
     }
 
-    console.log("found item", item);
+    const item = LZString.decompress(itemCompr);
+    
 
     // parse JSON for what was found
 
@@ -199,7 +229,7 @@ export class LocalStorageWrapper<TDataType> extends React.Component<
     prevState: LocalStorageWrapperState<TDataType>
   ) {
     // if activeItem changed... save to local storage.. update self
-    console.log("state update wrappeR", this.props.storageName, this.props);
+
     if (!_.isEqual(prevProps.activeItem, this.props.activeItem)) {
       // do a check for undefined and kick out?
       if (this.props.activeItem === undefined) {
@@ -214,10 +244,11 @@ export class LocalStorageWrapper<TDataType> extends React.Component<
       }
       console.log("save item", this.props.activeItem);
 
-      localStorage.setItem(
-        this.props.storageName,
-        JSON.stringify(this.props.activeItem)
-      );
+      // compress and save
+
+      const strToStore = JSON.stringify(this.props.activeItem);
+      const strToStoreCompr = LZString.compress(strToStore);
+      localStorage.setItem(this.props.storageName, strToStoreCompr);
 
       this.setState({ item: this.props.activeItem }, () =>
         this.props.dataDidUpdate(this.props.activeItem)

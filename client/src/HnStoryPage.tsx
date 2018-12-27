@@ -2,7 +2,7 @@ import React from "react";
 import { HnComment } from "./HnComment";
 
 export interface HnStoryPageProps {
-  data: HnItem;
+  data: HnItem | undefined;
 }
 
 export class HnStoryPage extends React.Component<HnStoryPageProps> {

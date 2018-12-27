@@ -12,6 +12,8 @@ export class Server {
     app.use(bodyParser.json());
     app.use(compression());
 
+    app.set("etag", false);
+
     app.get("/topstories/:type", (req, res) => {
       // return a set of 30 stories with the titel, comment count, and URL
       // add those to the DB and set some flag saying that they need full details loaded

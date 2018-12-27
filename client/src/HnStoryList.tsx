@@ -4,6 +4,7 @@ import { HnListItem } from "./HnListItem";
 
 interface HnStoryListProps {
   items: HnItem[];
+  requestNewData(): void;
 }
 
 export class HnStoryList extends React.Component<HnStoryListProps> {
@@ -15,11 +16,14 @@ export class HnStoryList extends React.Component<HnStoryListProps> {
   }
   render() {
     return (
-      <div>
-        {this.props.items.map(item => (
-          <HnListItem data={item} key={item.id} />
-        ))}
-      </div>
+      <React.Fragment>
+        <div onClick={this.props.requestNewData}>reload</div>
+        <div>
+          {this.props.items.map(item => (
+            <HnListItem data={item} key={item.id} />
+          ))}
+        </div>
+      </React.Fragment>
     );
   }
 }
