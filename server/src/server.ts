@@ -1,6 +1,7 @@
 import * as bodyParser from "body-parser";
 import * as compression from "compression";
 import * as express from "express";
+import * as path from "path";
 
 import { _getFullDataForIds, db_getTopStoryIds } from "./database";
 import { TopStoriesParams } from "./interfaces";
@@ -11,6 +12,8 @@ export class Server {
 
     app.use(bodyParser.json());
     app.use(compression());
+
+    app.use(express.static(path.join(__dirname, "../../client/build")));
 
     app.set("etag", false);
 
@@ -34,6 +37,10 @@ export class Server {
       });
 
       // find that type...
+    });
+
+    app.get("*", (req, res) => {
+      res.sendFile(path.join(__dirname, "../../client/build/index.html"));
     });
 
     var port = process.env.PORT || 3001;

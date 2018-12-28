@@ -13,7 +13,7 @@ export class HnStoryPage extends React.Component<HnStoryPageProps> {
     const comments = this.props.data.kidsObj || [];
     return (
       <div>
-        {this.props.data.title}
+        <h2>{this.props.data.title}</h2>
         {comments.map(comment => (
           <HnComment key={comment.id} comment={comment} depth={0} />
         ))}
