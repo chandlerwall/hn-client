@@ -1,8 +1,7 @@
-import _ from "lodash";
 import React from "react";
-import LZString from "lz-string";
 
 import { HnListSource } from "./App";
+import { LocalStorageWrapper } from "./LocalStorageWrapper";
 
 interface DataLayerState {
   frontItems: HnItem[];
@@ -19,9 +18,7 @@ interface DataLayerProps {
 }
 
 export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
-  refreshData(activeList: HnListSource): void {
-    
-  }
+  refreshData(activeList: HnListSource): void {}
   constructor(props: DataLayerProps) {
     super(props);
 
@@ -90,6 +87,7 @@ export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
 
   getPageData(page: string | undefined) {
     // TODO: add loading step if data is missing -- figure out how to trigger refresh
+    console.log("getpage state", this.state);
     switch (page) {
       case "day":
         if (this.state.dayItems.length === 0) {
@@ -149,7 +147,7 @@ export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
   }
 
   updateNewItems(data: HnItem[] | undefined, listType: HnListSource): void {
-    console.log("new items2 front", data, listType);
+    console.log("new items2", data, listType);
 
     if (data === undefined) {
       data = [];
@@ -174,85 +172,3 @@ export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
   }
 }
 
-interface LocalStorageWrapperProps<TDataType> {
-  storageName: string;
-  activeItem: TDataType;
-
-  dataDidUpdate(item: TDataType | undefined): void;
-}
-
-interface LocalStorageWrapperState<TDataType> {
-  item: TDataType | undefined;
-}
-
-export class LocalStorageWrapper<TDataType> extends React.Component<
-  LocalStorageWrapperProps<TDataType>,
-  LocalStorageWrapperState<TDataType>
-> {
-  constructor(props: LocalStorageWrapperProps<TDataType>) {
-    super(props);
-
-    this.state = {
-      item: undefined
-    };
-  }
-  render() {
-    return null;
-  }
-
-  componentDidMount() {
-    // check localStorage for obj
-
-    const itemCompressed = localStorage.getItem(this.props.storageName);
-
-    // decompress
-
-    if (itemCompressed === undefined || itemCompressed === null) {
-      this.setState({ item: undefined }, () =>
-        this.props.dataDidUpdate(undefined)
-      );
-      return;
-    }
-
-    const item = LZString.decompress(itemCompressed);
-    
-
-    // parse JSON for what was found
-
-    const obj = JSON.parse(item) as TDataType;
-
-    this.setState({ item: obj }, () => this.props.dataDidUpdate(obj));
-  }
-
-  componentDidUpdate(
-    prevProps: LocalStorageWrapperProps<TDataType>,
-    prevState: LocalStorageWrapperState<TDataType>
-  ) {
-    // if activeItem changed... save to local storage.. update self
-
-    if (!_.isEqual(prevProps.activeItem, this.props.activeItem)) {
-      // do a check for undefined and kick out?
-      if (this.props.activeItem === undefined) {
-        return;
-      }
-
-      // TODO: this save should only happen when the data is new
-      if (_.isEqual(this.state.item, this.props.activeItem)) {
-        // do not need to save or update... it is the same as current state
-        // happens when loaded
-        return;
-      }
-      console.log("save item", this.props.activeItem);
-
-      // compress and save
-
-      const strToStore = JSON.stringify(this.props.activeItem);
-      const strToStoreCompressed = LZString.compress(strToStore);
-      localStorage.setItem(this.props.storageName, strToStoreCompressed);
-
-      this.setState({ item: this.props.activeItem }, () =>
-        this.props.dataDidUpdate(this.props.activeItem)
-      );
-    }
-  }
-}

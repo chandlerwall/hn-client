@@ -20,4 +20,8 @@ export class HnStoryPage extends React.Component<HnStoryPageProps> {
       </div>
     );
   }
+
+  componentDidMount() {
+    window.scrollTo(0, 0);
+  }
 }

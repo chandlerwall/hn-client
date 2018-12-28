@@ -26,4 +26,6 @@ export class HnStoryList extends React.Component<HnStoryListProps> {
       </React.Fragment>
     );
   }
+
+  
 }
