@@ -13,6 +13,7 @@ export class Server {
     app.use(bodyParser.json());
     app.use(compression());
 
+    // this assumes that the app is running in server/build
     app.use(express.static(path.join(__dirname, "../../client/build")));
 
     app.set("etag", false);
