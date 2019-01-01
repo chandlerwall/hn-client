@@ -6,9 +6,10 @@ interface HnItem {
   time: number;
   title: string;
   type: string;
-  url: string;
+  url?: string; // optional for Ask HN and internal items
   kidsObj?: KidsObj3[];
   lastUpdated: number;
+  text?:string; // this is for Ask HN and others that are internal
 }
 
 interface KidsObj3 {
