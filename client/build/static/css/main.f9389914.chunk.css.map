@@ -1,1 +1,0 @@
-{"version":3,"sources":["/Users/byronwall/Projects/hn-node/client/src/App.css"],"names":[],"mappings":"AAAA,KACE,gBAAiB,AACjB,iBAAkB,AAClB,iBAAmB,CACpB,AAED,UACE,WAAa,CACd","file":"main.f9389914.chunk.css","sourcesContent":["body {\n  max-width: 800px;\n  margin-left: auto;\n  margin-right: auto;\n}\n\n.bp3-card {\n  padding: 5px;\n}\n"]}
