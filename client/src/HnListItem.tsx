@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { timeSince } from "./timeSince";
 
 export interface HnStoryProps {
   data: HnItem;
@@ -16,9 +17,12 @@ export class HnListItem extends React.Component<HnStoryProps> {
         <p>
           <span>{story.score + " | "}</span>
           <Link to={"/story/" + story.id}>
-            <span>{story.descendants}</span>
+            <span>
+              {story.descendants}
+              {" comments"}
+            </span>
           </Link>
-          <span>{" | " + story.score}</span>
+          <span>{" | " + timeSince(story.time) + " ago"}</span>
         </p>
       </div>
     );

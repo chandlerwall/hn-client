@@ -1,5 +1,6 @@
 import { Card } from "@blueprintjs/core";
 import React from "react";
+import { timeSince } from "./timeSince";
 
 export interface HnCommentProps {
   comment: KidsObj3;
@@ -44,11 +45,16 @@ export class HnComment extends React.Component<HnCommentProps, HnCommentState> {
         interactive
         onClick={e => this.handleCardClick(e)}
         style={{
-          paddingLeft: this.props.depth * 10,
+          paddingLeft: (Math.min(this.props.depth, 5) + 1) * 12,
           width: "100%"
         }}
       >
-        <p>{this.props.comment.by}</p>
+        <p>
+          {this.props.comment.by}
+          {" | "}
+          {timeSince(this.props.comment.time)}
+          {" ago"}
+        </p>
 
         {childrenToShow}
       </Card>

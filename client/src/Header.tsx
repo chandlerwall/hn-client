@@ -1,22 +1,44 @@
-import { Alignment, Navbar } from "@blueprintjs/core";
 import React from "react";
-import { Link } from "react-router-dom";
+import { Nav, Navbar, NavItem, Button, Glyphicon } from "react-bootstrap";
+import { LinkContainer } from "react-router-bootstrap";
+import { NavLink } from "react-router-dom";
 
-export class Header extends React.Component {
+interface HeaderProps {
+  requestNewData(): void;
+}
+
+export class Header extends React.PureComponent<HeaderProps> {
   render() {
     return (
       <Navbar>
-        <Navbar.Group align={Alignment.LEFT}>
-          <Navbar.Heading>
-            <Link to="/">hn-offline</Link>
-          </Navbar.Heading>
-          <Navbar.Divider />
-          <Link to="/day">day</Link>
-          <Navbar.Divider />
-          <Link to="/week">week</Link>
-          <Navbar.Divider />
-          <Link to="/month">month</Link>
-        </Navbar.Group>
+        <Navbar.Header>
+          <Navbar.Brand>
+            <NavLink to="/">hn-offline</NavLink>
+          </Navbar.Brand>
+        </Navbar.Header>
+        <Nav>
+          <LinkContainer exact to="/">
+            <NavItem eventKey={0}>front</NavItem>
+          </LinkContainer>
+
+          <LinkContainer to="/day">
+            <NavItem eventKey={1}>day</NavItem>
+          </LinkContainer>
+
+          <LinkContainer to="/week">
+            <NavItem eventKey={2}>week</NavItem>
+          </LinkContainer>
+
+          <LinkContainer to="/month">
+            <NavItem eventKey={3}>month</NavItem>
+          </LinkContainer>
+        </Nav>
+
+        <Navbar.Form pullRight>
+          <Button bsStyle="primary" onClick={() => this.props.requestNewData()}>
+            <Glyphicon glyph="refresh" />
+          </Button>
+        </Navbar.Form>
       </Navbar>
     );
   }
