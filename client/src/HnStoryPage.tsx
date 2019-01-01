@@ -28,6 +28,10 @@ export class HnStoryPage extends React.Component<HnStoryPageProps> {
           <span>{getDomain(this.props.data.url)}</span>
         </h4>
 
+        {this.props.data.text !== undefined && (
+          <p dangerouslySetInnerHTML={{ __html: this.props.data.text }} />
+        )}
+
         {comments.map(comment => (
           <HnComment key={comment.id} comment={comment} depth={0} />
         ))}

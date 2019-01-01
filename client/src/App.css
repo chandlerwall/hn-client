@@ -19,11 +19,23 @@ body {
 
 .bp3-card {
   padding: 5px;
-  border: 1px solid grey;
+  border-left: 1px solid grey;
+  border-right: 1px solid grey;
+  border-top: 1px solid grey;
+}
+
+.bp3-card:last-child {
+  border-bottom: 1px solid grey;
 }
 
 .bp3-card:hover {
-  border: 1px solid black;
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+  border-top: 1px solid black;
+}
+
+.bp3-card:last-child:hover {
+  border-bottom: 1px solid black;
 }
 
 .navbar-brand {
