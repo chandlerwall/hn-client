@@ -17,10 +17,6 @@ export class Header extends React.PureComponent<HeaderProps> {
           </Navbar.Brand>
         </Navbar.Header>
         <Nav>
-          <LinkContainer exact to="/">
-            <NavItem eventKey={0}>front</NavItem>
-          </LinkContainer>
-
           <LinkContainer to="/day">
             <NavItem eventKey={1}>day</NavItem>
           </LinkContainer>

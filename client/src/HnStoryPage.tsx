@@ -1,6 +1,7 @@
 import React from "react";
 import { HnComment } from "./HnComment";
 import { timeSince } from "./timeSince";
+import { getDomain } from "./getDomain";
 
 export interface HnStoryPageProps {
   data: HnItem | undefined;
@@ -23,7 +24,10 @@ export class HnStoryPage extends React.Component<HnStoryPageProps> {
           <span>{this.props.data.score}</span>
           <span>{" | "}</span>
           <span>{timeSince(this.props.data.time)} ago</span>
+          <span>{" | "}</span>
+          <span>{getDomain(this.props.data.url)}</span>
         </h4>
+
         {comments.map(comment => (
           <HnComment key={comment.id} comment={comment} depth={0} />
         ))}
