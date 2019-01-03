@@ -90,7 +90,7 @@ var AlgoliaApi = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        timestamp = helpers_1._getUnixTimestamp() - 60 * 60 * 24 * 7 * 30;
+                        timestamp = helpers_1._getUnixTimestamp() - 60 * 60 * 24 * 30;
                         options = {
                             uri: "https://hn.algolia.com/api/v1/search?tags=story&numericFilters=created_at_i>" +
                                 timestamp,
