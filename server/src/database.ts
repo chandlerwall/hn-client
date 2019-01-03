@@ -142,7 +142,7 @@ async function _getTopStories(type: TopStoriesType) {
     case "topstories":
       return (await HackerNewsApi.get().fetchItemIds("topstories")).slice(
         0,
-        20
+        30
       );
     case "day":
       return await AlgoliaApi.getDay();

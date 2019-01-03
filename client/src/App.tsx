@@ -79,13 +79,11 @@ class _App extends React.Component<AppPageProps, AppState> {
           provideNewItems={this.newItemsProvided}
         />
 
-        <Header requestNewData={() => {
-                  this.dataLayer.current!.updateNewItems(
-                    undefined,
-                    this.state.activeList
-                  );
-                  this.setState({ items: [] });
-                }}/>
+        <Header
+          requestNewData={() => {
+            this.dataLayer.current!.loadData(this.state.activeList);
+          }}
+        />
 
         <Switch>
           <Route
@@ -114,7 +112,6 @@ class _App extends React.Component<AppPageProps, AppState> {
                         props.match.params.page
                       )
                 }
-                
               />
             )}
           />

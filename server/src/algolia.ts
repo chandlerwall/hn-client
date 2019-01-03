@@ -40,7 +40,7 @@ export class AlgoliaApi {
   }
 
   static async getMonth() {
-    let timestamp = _getUnixTimestamp() - 60 * 60 * 24 * 7 * 30;
+    let timestamp = _getUnixTimestamp() - 60 * 60 * 24 * 30;
 
     var options = {
       uri:

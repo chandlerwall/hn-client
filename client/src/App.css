@@ -22,6 +22,7 @@ body {
   border-left: 1px solid grey;
   border-right: 1px solid grey;
   border-top: 1px solid grey;
+  overflow-wrap: break-word;
 }
 
 .bp3-card:last-child {

@@ -45,7 +45,7 @@ export class HnComment extends React.Component<HnCommentProps, HnCommentState> {
         interactive
         onClick={e => this.handleCardClick(e)}
         style={{
-          paddingLeft: (Math.min(this.props.depth, 5) + 1) * 12,
+          paddingLeft: 12,
           width: "100%"
         }}
       >

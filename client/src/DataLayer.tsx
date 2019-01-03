@@ -112,7 +112,7 @@ export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
     }
   }
 
-  async loadData(activeList: HnListSource) {
+  public async loadData(activeList: HnListSource) {
     console.log("loading data");
     let url = "";
     switch (activeList) {
@@ -171,4 +171,3 @@ export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
     this.props.provideNewItems(data, listType);
   }
 }
-
