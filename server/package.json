@@ -7,7 +7,8 @@
     "server": "nodemon --watch '*.ts' --exec ts-node src/index.ts",
     "client": "cd ../client && yarn start",
     "dev": "concurrently \"yarn server\" \"yarn client\"",
-    "start": "node build/index.js"
+    "start": "node build/index.js",
+    "build": "tsc && cd ../client && yarn build"
   },
   "author": "",
   "license": "ISC",
