@@ -4,11 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "server": "nodemon --watch '*.ts' --exec ts-node src/index.ts",
+    "server": "nodemon --watch '*.ts' --exec yarn build_run",
     "client": "cd ../client && yarn start",
     "dev": "concurrently \"yarn server\" \"yarn client\"",
     "start": "node build/index.js",
-    "build": "tsc && cd ../client && yarn build"
+    "build": "tsc && cd ../client && yarn build",
+    "build_run": "tsc && yarn start"
   },
   "author": "",
   "license": "ISC",
@@ -19,7 +20,7 @@
     "@types/node": "^8.0.47",
     "@types/request-promise": "^4.1.41",
     "nodemon": "^1.17.2",
-    "ts-node": "^3.3.0",
+    "ts-node": "^7.0.1",
     "typescript": "^2.5.3"
   },
   "dependencies": {

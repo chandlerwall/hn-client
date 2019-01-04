@@ -27,27 +27,18 @@ export class Database {
 
 export async function db_getTopStoryIds(reqType: TopStoriesType) {
   return new Promise<number[]>((resolve, reject) => {
-    console.log("searching DB for topstories");
     Database.get().findOne<TopStories>({ id: reqType }, (err, doc) => {
       if (err !== null) {
         console.log("error occurred fetching ids", err);
         return reject(err);
       }
 
-      console.log("group search", doc);
-
       if (doc !== null) {
-        console.log("doc exists");
         const shouldUpdate = _getUnixTimestamp() - doc.lastUpdated > 600;
         if (!shouldUpdate) {
-          console.log("time is good");
           return resolve(doc.items);
         }
-      }
-
-      // TODO: add a second check here to determine when to reload
-
-      console.log("updating the top stories");
+      } 
 
       _getTopStories(reqType).then(ids => {
         let topstories: TopStories = {
@@ -56,15 +47,12 @@ export async function db_getTopStoryIds(reqType: TopStoriesType) {
           lastUpdated: _getUnixTimestamp()
         };
 
-        console.log("new top stories", topstories);
-
         // this will update or insert the new topstories
         Database.get().update(
           { id: topstories.id },
           topstories,
           { upsert: true },
           (err, numUpdated, upsert) => {
-            console.log("topstories upsert", err, numUpdated, upsert);
             return resolve(ids);
           }
         );
@@ -129,7 +117,6 @@ async function addItemToDb(item: Item) {
         if (err) {
           return reject(err);
         } else {
-          console.log("item added to DB: ", item.id);
           return resolve(true);
         }
       }
@@ -158,10 +145,8 @@ async function _getTopStories(type: TopStoriesType) {
 
 async function getItemFromDb(itemId: number): Promise<ItemExt> {
   return new Promise<ItemExt>((resolve, reject) => {
-    console.log("find one: ", itemId);
     Database.get().findOne<ItemExt>({ id: itemId }, (err, doc) => {
       if (err !== null) {
-        console.log("error, find one: ", err);
         return reject(err);
       } else {
         if (doc === null || _isTimePastThreshold(doc)) {
@@ -182,8 +167,6 @@ export async function _getFullDataForIds(itemIDs: number[]) {
 
     /// TODO: add a check to the data updated
     if (obj === null) {
-      console.log("id was null, going for an update", itemIDs[i]);
-
       let item = await HackerNewsApi.get().fetchItem(itemIDs[i]);
       await addChildrenToItemRecurse(item);
       await addItemToDb(item);

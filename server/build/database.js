@@ -1,11 +1,14 @@
 "use strict";
-var __assign = (this && this.__assign) || Object.assign || function(t) {
-    for (var s, i = 1, n = arguments.length; i < n; i++) {
-        s = arguments[i];
-        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-            t[p] = s[p];
-    }
-    return t;
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
 };
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -69,33 +72,25 @@ function db_getTopStoryIds(reqType) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             return [2 /*return*/, new Promise(function (resolve, reject) {
-                    console.log("searching DB for topstories");
                     Database.get().findOne({ id: reqType }, function (err, doc) {
                         if (err !== null) {
                             console.log("error occurred fetching ids", err);
                             return reject(err);
                         }
-                        console.log("group search", doc);
                         if (doc !== null) {
-                            console.log("doc exists");
                             var shouldUpdate = helpers_1._getUnixTimestamp() - doc.lastUpdated > 600;
                             if (!shouldUpdate) {
-                                console.log("time is good");
                                 return resolve(doc.items);
                             }
                         }
-                        // TODO: add a second check here to determine when to reload
-                        console.log("updating the top stories");
                         _getTopStories(reqType).then(function (ids) {
                             var topstories = {
                                 id: reqType,
                                 items: ids,
                                 lastUpdated: helpers_1._getUnixTimestamp()
                             };
-                            console.log("new top stories", topstories);
                             // this will update or insert the new topstories
                             Database.get().update({ id: topstories.id }, topstories, { upsert: true }, function (err, numUpdated, upsert) {
-                                console.log("topstories upsert", err, numUpdated, upsert);
                                 return resolve(ids);
                             });
                         });
@@ -170,7 +165,6 @@ function addItemToDb(item) {
                             return reject(err);
                         }
                         else {
-                            console.log("item added to DB: ", item.id);
                             return resolve(true);
                         }
                     });
@@ -212,10 +206,8 @@ function getItemFromDb(itemId) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             return [2 /*return*/, new Promise(function (resolve, reject) {
-                    console.log("find one: ", itemId);
                     Database.get().findOne({ id: itemId }, function (err, doc) {
                         if (err !== null) {
-                            console.log("error, find one: ", err);
                             return reject(err);
                         }
                         else {
@@ -245,7 +237,6 @@ function _getFullDataForIds(itemIDs) {
                     if (!(i < itemObjs.length)) return [3 /*break*/, 7];
                     obj = itemObjs[i];
                     if (!(obj === null)) return [3 /*break*/, 6];
-                    console.log("id was null, going for an update", itemIDs[i]);
                     return [4 /*yield*/, api_1.HackerNewsApi.get().fetchItem(itemIDs[i])];
                 case 3:
                     item = _a.sent();
