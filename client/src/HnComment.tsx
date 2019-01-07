@@ -24,6 +24,17 @@ export class HnComment extends React.Component<HnCommentProps, HnCommentState> {
     const childComments = this.props.comment.kidsObj || [];
     const commentText = this.props.comment.text || "";
 
+    const comment = this.props.comment;
+
+    if (
+      this.props.comment.deleted &&
+      (this.props.comment.kidsObj === undefined ||
+        comment.kidsObj!.length === 0)
+    ) {
+      // kick out nothing if the comment was deleted and has no children
+      return null;
+    }
+
     // TODO: rewrite links to hn to open in this site instead
 
     const childrenToShow = !this.state.isOpen ? null : (
