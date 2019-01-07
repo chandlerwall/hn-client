@@ -45,6 +45,7 @@ var Server = /** @class */ (function () {
     function Server() {
     }
     Server.start = function () {
+        var _this = this;
         var app = express();
         app.use(bodyParser.json());
         app.use(compression());
@@ -61,6 +62,27 @@ var Server = /** @class */ (function () {
             res.json(cachedData[reqType]);
             // find that type...
         });
+        app.get("/api/story/:id", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
+            var params, storyId, storyData;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        params = req.params;
+                        storyId = params.id;
+                        console.log(new Date(), "req story", storyId);
+                        return [4 /*yield*/, database_1._getFullDataForIds([+storyId])];
+                    case 1:
+                        storyData = _a.sent();
+                        // load the single story and then return
+                        if (storyData.length > 0) {
+                            res.json(storyData[0]);
+                            return [2 /*return*/];
+                        }
+                        res.json({ error: "story not found" });
+                        return [2 /*return*/];
+                }
+            });
+        }); });
         app.get("*", function (req, res) {
             res.sendFile(path.join(__dirname, "../../client/build/index.html"));
         });
