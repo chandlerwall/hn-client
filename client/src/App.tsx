@@ -91,13 +91,8 @@ class _App extends React.Component<AppPageProps, AppState> {
             exact
             render={(props: StoryPageProps) => (
               <HnStoryPage
-                data={
-                  this.dataLayer.current === null
-                    ? undefined
-                    : this.dataLayer.current.getStoryData(
-                        +props.match.params.id
-                      )
-                }
+                id={+props.match.params.id}
+                dataLayer={this.dataLayer.current}
               />
             )}
           />
@@ -119,6 +114,7 @@ class _App extends React.Component<AppPageProps, AppState> {
       </div>
     );
   }
+
   newItemsProvided(items: HnItem[], listType: HnListSource): void {
     if (listType === this.state.activeList) {
       this.setState({ items });

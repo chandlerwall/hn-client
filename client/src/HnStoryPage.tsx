@@ -2,34 +2,54 @@ import React from "react";
 import { HnComment } from "./HnComment";
 import { timeSince } from "./timeSince";
 import { getDomain } from "./getDomain";
+import { DataLayer } from "./DataLayer";
 
-export interface HnStoryPageProps {
+interface HnStoryPageState {
   data: HnItem | undefined;
 }
 
-export class HnStoryPage extends React.Component<HnStoryPageProps> {
+export interface HnStoryPageProps {
+  dataLayer: DataLayer | null;
+  id: number;
+}
+
+export class HnStoryPage extends React.Component<
+  HnStoryPageProps,
+  HnStoryPageState
+> {
+  constructor(props: HnStoryPageProps) {
+    super(props);
+
+    this.state = {
+      data: undefined
+    };
+  }
+
   render() {
-    if (this.props.data === undefined) {
+    if (this.state.data === undefined) {
       return null;
     }
-    const comments = this.props.data.kidsObj || [];
+
+    const storyData = this.state.data;
+
+    const comments = storyData.kidsObj || [];
     return (
       <div>
         <h2>
-          <a href={this.props.data.url}>{this.props.data.title}</a>
+          <a href={storyData.url}>{storyData.title}</a>
         </h2>
         <h4>
-          <span>{this.props.data.by}</span>
+          <span>{storyData.by}</span>
           <span>{" | "}</span>
-          <span>{this.props.data.score}</span>
+          <span>{storyData.score}</span>
           <span>{" | "}</span>
-          <span>{timeSince(this.props.data.time)} ago</span>
+          <span>{timeSince(storyData.time)} ago</span>
           <span>{" | "}</span>
-          <span>{getDomain(this.props.data.url)}</span>
+          <span>{getDomain(storyData.url)}</span>
         </h4>
 
-        {this.props.data.text !== undefined && (
-          <p dangerouslySetInnerHTML={{ __html: this.props.data.text }} />
+        {storyData.text !== undefined && (
+          <p dangerouslySetInnerHTML={{ __html: storyData.text }} />
         )}
 
         {comments.map(comment => (
@@ -41,5 +61,27 @@ export class HnStoryPage extends React.Component<HnStoryPageProps> {
 
   componentDidMount() {
     window.scrollTo(0, 0);
+
+    // set the data initially -- kick off async request if needed
+    this.updateDataFromDataLayer();
+  }
+
+  private async updateDataFromDataLayer() {
+    const storyData = await this.getStoryData(this.props.id);
+
+    this.setState({ data: storyData });
+  }
+
+  componentDidUpdate(prevProps: HnStoryPageProps) {
+    // load the story once the data layer is available
+    if (prevProps.dataLayer === null && this.props.dataLayer !== null) {
+      this.updateDataFromDataLayer();
+    }
+  }
+
+  private async getStoryData(id: number): Promise<HnItem | undefined> {
+    return this.props.dataLayer === null
+      ? undefined
+      : await this.props.dataLayer.getStoryData(id);
   }
 }

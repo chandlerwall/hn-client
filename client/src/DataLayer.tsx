@@ -61,7 +61,7 @@ export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
     );
   }
 
-  getStoryData(id: number) {
+  async getStoryData(id: number) {
     let item = this.state.frontItems.find(c => c.id === id);
     if (item !== undefined) {
       return item;
@@ -82,7 +82,28 @@ export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
       return item;
     }
 
-    return undefined;
+    // hit the API for the story data
+    return await this.getStoryFromServer(id);
+  }
+
+  public async getStoryFromServer(id: number) {
+    let url = "/api/story/" + id;
+
+    const response = await fetch(url);
+    if (!response.ok) {
+      console.error(response);
+      return undefined;
+    }
+    const data: HnItem | { error: string } = await response.json();
+
+    if ("error" in data) {
+      console.error(data);
+      return undefined;
+    }
+
+    console.log("hn item from server", data);
+
+    return data;
   }
 
   getPageData(page: string | undefined) {

@@ -33,6 +33,25 @@ export class Server {
       // find that type...
     });
 
+    app.get("/api/story/:id", async (req, res) => {
+      // loads the details for a single story -- results are saved to DB but not cached
+
+      let params: { id: string } = req.params;
+      let storyId = params.id;
+
+      console.log(new Date(), "req story", storyId);
+
+      const storyData = await _getFullDataForIds([+storyId]);
+
+      // load the single story and then return
+      if (storyData.length > 0) {
+        res.json(storyData[0]);
+        return;
+      }
+
+      res.json({ error: "story not found" });
+    });
+
     app.get("*", (req, res) => {
       res.sendFile(path.join(__dirname, "../../client/build/index.html"));
     });
