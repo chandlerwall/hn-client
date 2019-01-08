@@ -1,8 +1,10 @@
+import { History } from "history";
 import React from "react";
+
+import { DataLayer } from "./DataLayer";
+import { getDomain } from "./getDomain";
 import { HnComment } from "./HnComment";
 import { timeSince } from "./timeSince";
-import { getDomain } from "./getDomain";
-import { DataLayer } from "./DataLayer";
 
 interface HnStoryPageState {
   data: HnItem | undefined;
@@ -11,6 +13,7 @@ interface HnStoryPageState {
 export interface HnStoryPageProps {
   dataLayer: DataLayer | null;
   id: number;
+  history: History;
 }
 
 export class HnStoryPage extends React.Component<
@@ -23,6 +26,8 @@ export class HnStoryPage extends React.Component<
     this.state = {
       data: undefined
     };
+
+    this.anchorClickHandler = this.anchorClickHandler.bind(this);
   }
 
   render() {
@@ -64,6 +69,33 @@ export class HnStoryPage extends React.Component<
 
     // set the data initially -- kick off async request if needed
     this.updateDataFromDataLayer();
+    document.body.addEventListener("click", this.anchorClickHandler);
+  }
+
+  componentWillUnmount() {
+    document.body.removeEventListener("click", this.anchorClickHandler);
+  }
+  anchorClickHandler(e: any) {
+    if (e.target.tagName !== "A") {
+      return;
+    }
+
+    // have a link
+
+    const link = e.target as HTMLAnchorElement;
+
+    const regex = /https?:\/\/news\.ycombinator\.com\/item\?id=(\d+)/;
+    const matches = link.href.match(regex);
+
+    if (matches === null) {
+      return;
+    }
+
+    // this will navigate to the new page
+    this.props.history.push("/story/" + matches[1]);
+
+    e.preventDefault();
+    return false;
   }
 
   private async updateDataFromDataLayer() {

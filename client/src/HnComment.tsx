@@ -75,6 +75,11 @@ export class HnComment extends React.Component<HnCommentProps, HnCommentState> {
     // this is to prevent other cards from collapsing too
     e.stopPropagation();
 
+    // dont update state if click was A link
+    if ((e.target as any).tagName === "A") {
+      return;
+    }
+
     this.setState({ isOpen: !this.state.isOpen });
   }
 }

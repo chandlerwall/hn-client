@@ -93,6 +93,8 @@ class _App extends React.Component<AppPageProps, AppState> {
               <HnStoryPage
                 id={+props.match.params.id}
                 dataLayer={this.dataLayer.current}
+                history={props.history}
+                key={+props.match.params.id}
               />
             )}
           />
