@@ -5,6 +5,12 @@ body {
   padding: 5px;
 }
 
+/* indent on quotes */
+
+.comment p:first-of-type {
+  margin-top: 5px;
+}
+
 @media (min-width: 1200px) {
   .container {
     max-width: 800px;

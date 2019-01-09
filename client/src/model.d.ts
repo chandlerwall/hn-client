@@ -7,9 +7,9 @@ interface HnItem {
   title: string;
   type: string;
   url?: string; // optional for Ask HN and internal items
-  kidsObj?: KidsObj3[];
+  kidsObj?: Array<KidsObj3 | null>;
   lastUpdated: number;
-  text?:string; // this is for Ask HN and others that are internal
+  text?: string; // this is for Ask HN and others that are internal
 }
 
 interface KidsObj3 {

@@ -1,5 +1,7 @@
 import "./App.css";
 
+import * as Sentry from "@sentry/browser";
+import localForage from "localforage";
 import _ from "lodash";
 import React, { RefObject } from "react";
 import { Route, RouteComponentProps, Switch, withRouter } from "react-router";
@@ -46,7 +48,8 @@ class _App extends React.Component<AppPageProps, AppState> {
     this.state = {
       items: [],
       allItems: [],
-      activeList: HnListSource.Front
+      activeList: HnListSource.Front,
+      error: undefined
     };
 
     this.dataLayer = React.createRef();
@@ -70,8 +73,33 @@ class _App extends React.Component<AppPageProps, AppState> {
     });
   }
 
+  componentDidCatch(error: any, errorInfo: any) {
+    this.setState({ error });
+    Sentry.withScope(scope => {
+      Object.keys(errorInfo).forEach(key => {
+        scope.setExtra(key, errorInfo[key]);
+      });
+      Sentry.captureException(error);
+    });
+
+    // clear out all localForage stuff to be save
+    localForage.clear();
+  }
+
   render() {
     console.log("render state", this.state);
+
+    if (this.state.error !== undefined) {
+      return (
+        <div>
+          <p>an error occurred, refresh the page</p>
+          <p>
+            unfortunately, your local data was cleared to prevent corruption
+          </p>
+        </div>
+      );
+    }
+
     return (
       <div>
         <DataLayer
@@ -136,6 +164,8 @@ export enum HnListSource {
 interface AppState {
   items: HnItem[];
   allItems: HnItem[];
+
+  error: any;
 
   activeList: HnListSource;
 }

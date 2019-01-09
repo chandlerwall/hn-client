@@ -3,7 +3,7 @@ import React from "react";
 import { timeSince } from "./timeSince";
 
 export interface HnCommentProps {
-  comment: KidsObj3;
+  comment: KidsObj3 | null;
   depth: number;
 }
 
@@ -21,15 +21,18 @@ export class HnComment extends React.Component<HnCommentProps, HnCommentState> {
   }
 
   render() {
-    const childComments = this.props.comment.kidsObj || [];
-    const commentText = this.props.comment.text || "";
-
     const comment = this.props.comment;
 
+    if (comment === null) {
+      return null;
+    }
+
+    const childComments = comment.kidsObj || [];
+    const commentText = comment.text || "";
+
     if (
-      this.props.comment.deleted &&
-      (this.props.comment.kidsObj === undefined ||
-        comment.kidsObj!.length === 0)
+      comment.deleted &&
+      (comment.kidsObj === undefined || comment.kidsObj!.length === 0)
     ) {
       // kick out nothing if the comment was deleted and has no children
       return null;
@@ -39,11 +42,14 @@ export class HnComment extends React.Component<HnCommentProps, HnCommentState> {
 
     const childrenToShow = !this.state.isOpen ? null : (
       <React.Fragment>
-        <p dangerouslySetInnerHTML={{ __html: commentText }} />
+        <p
+          className="comment"
+          dangerouslySetInnerHTML={{ __html: commentText }}
+        />
 
         {childComments.map(childComm => (
           <HnComment
-            key={this.props.comment.id + "-" + childComm.id}
+            key={comment.id + "-" + childComm.id}
             comment={childComm}
             depth={this.props.depth + 1}
           />
@@ -61,9 +67,9 @@ export class HnComment extends React.Component<HnCommentProps, HnCommentState> {
         }}
       >
         <p>
-          {this.props.comment.by}
+          {comment.by}
           {" | "}
-          {timeSince(this.props.comment.time)}
+          {timeSince(comment.time)}
           {" ago"}
         </p>
 

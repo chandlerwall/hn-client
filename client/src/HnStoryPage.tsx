@@ -52,13 +52,19 @@ export class HnStoryPage extends React.Component<
           <span>{" | "}</span>
           <span>{getDomain(storyData.url)}</span>
         </h4>
-
         {storyData.text !== undefined && (
-          <p dangerouslySetInnerHTML={{ __html: storyData.text }} />
+          <p
+            className="top-text"
+            dangerouslySetInnerHTML={{ __html: storyData.text }}
+          />
         )}
 
         {comments.map(comment => (
-          <HnComment key={comment.id} comment={comment} depth={0} />
+          <HnComment
+            key={(comment || { id: 0 }).id}
+            comment={comment}
+            depth={0}
+          />
         ))}
       </div>
     );
