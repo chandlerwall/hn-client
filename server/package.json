@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "server": "nodemon --watch '*.ts' --exec yarn build_run",
+    "server": "nodemon --watch '*.ts' --exec \"tsc && node build/index.js\"",
     "client": "cd ../client && yarn start",
     "dev": "concurrently \"yarn server\" \"yarn client\"",
     "start": "node build/index.js",
