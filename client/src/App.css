@@ -11,6 +11,10 @@ body {
   margin-top: 5px;
 }
 
+.comment-header {
+  font-weight: 450;
+}
+
 @media (min-width: 1200px) {
   .container {
     max-width: 800px;
@@ -24,25 +28,14 @@ body {
 }
 
 .bp3-card {
-  padding: 5px;
-  border-left: 1px solid grey;
-  border-right: 1px solid grey;
-  border-top: 1px solid grey;
+  padding-left: 5px;
+  padding-top: 0px;
+  padding-bottom: 0px;
   overflow-wrap: break-word;
-}
+  margin-top: 15px;
 
-.bp3-card:last-child {
-  border-bottom: 1px solid grey;
-}
-
-.bp3-card:hover {
-  border-left: 1px solid black;
-  border-right: 1px solid black;
-  border-top: 1px solid black;
-}
-
-.bp3-card:last-child:hover {
-  border-bottom: 1px solid black;
+  border-left-width: 3px;
+  border-left-style: solid;
 }
 
 .navbar-brand {

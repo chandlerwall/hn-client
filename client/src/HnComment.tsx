@@ -1,5 +1,5 @@
-import { Card } from "@blueprintjs/core";
 import React from "react";
+
 import { timeSince } from "./timeSince";
 
 export interface HnCommentProps {
@@ -10,6 +10,15 @@ export interface HnCommentProps {
 interface HnCommentState {
   isOpen: boolean;
 }
+
+const colors = [
+  "#bc8672",
+  "#c5be53",
+  "#d46850",
+  "#8c7f3b",
+  "#dec392",
+  "#c9893a"
+];
 
 export class HnComment extends React.Component<HnCommentProps, HnCommentState> {
   constructor(props: HnCommentProps) {
@@ -58,15 +67,19 @@ export class HnComment extends React.Component<HnCommentProps, HnCommentState> {
     );
 
     return (
-      <Card
-        interactive
+      <div
+        className="bp3-card"
         onClick={e => this.handleCardClick(e)}
         style={{
           paddingLeft: 12,
-          width: "100%"
+          width: "100%",
+          borderLeftColor:
+            this.props.depth < colors.length
+              ? colors[this.props.depth]
+              : "#bbb"
         }}
       >
-        <p>
+        <p className="comment-header">
           {comment.by}
           {" | "}
           {timeSince(comment.time)}
@@ -74,7 +87,7 @@ export class HnComment extends React.Component<HnCommentProps, HnCommentState> {
         </p>
 
         {childrenToShow}
-      </Card>
+      </div>
     );
   }
   handleCardClick(e: React.MouseEvent<HTMLDivElement>): void {
