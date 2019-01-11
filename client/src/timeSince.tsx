@@ -13,8 +13,8 @@ export function timeSince(date: number) {
     return interval + " days";
   }
   interval = Math.floor(seconds / 3600);
-  if (interval > 1) {
-    return interval + " hours";
+  if (interval >= 1) {
+    return interval + " hour" + (interval > 1 ? "s" : "");
   }
   interval = Math.floor(seconds / 60);
   if (interval > 1) {
