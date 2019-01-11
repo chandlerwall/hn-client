@@ -1,6 +1,6 @@
 interface HnItem {
   by: string;
-  descendants: number;
+  descendants?: number;
   id: number;
   score: number;
   time: number;
