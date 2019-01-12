@@ -5,6 +5,7 @@ import { DataLayer } from "./DataLayer";
 import { getDomain } from "./getDomain";
 import { HnComment } from "./HnComment";
 import { timeSince } from "./timeSince";
+import { Link } from "react-router-dom";
 
 interface HnStoryPageState {
   data: HnItem | undefined;
@@ -37,16 +38,25 @@ export class HnStoryPage extends React.Component<
 
     const storyData = this.state.data;
 
+    const storyLinkEl =
+      storyData.url === undefined ? (
+        <span>{storyData.title}</span>
+      ) : (
+        <a href={storyData.url}>{storyData.title}</a>
+      );
+
     const comments = storyData.kidsObj || [];
+
     return (
       <div>
-        <h2>
-          <a href={storyData.url}>{storyData.title}</a>
-        </h2>
+        <h2>{storyLinkEl}</h2>
         <h4>
           <span>{storyData.by}</span>
           <span>{" | "}</span>
-          <span>{storyData.score}</span>
+          <span>
+            {storyData.score}
+            {" points"}
+          </span>
           <span>{" | "}</span>
           <span>{timeSince(storyData.time)} ago</span>
           <span>{" | "}</span>

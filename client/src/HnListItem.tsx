@@ -21,13 +21,20 @@ export class HnListItem extends React.Component<HnStoryProps> {
       </Link>
     );
 
+    const storyLinkEl =
+      story.url === undefined ? (
+        <Link to={"/story/" + story.id}>{story.title}</Link>
+      ) : (
+        <a href={story.url}>{story.title}</a>
+      );
+
     return (
       <div>
+        <p>{storyLinkEl}</p>
         <p>
-          <a href={story.url}>{story.title}</a>
-        </p>
-        <p>
-          <span>{story.score}</span>
+          <span>
+            <Glyphicon glyph="chevron-up" /> {" " + story.score}
+          </span>
           {story.descendants !== undefined && commentCount}
           <span>{" | " + timeSince(story.time) + " ago"}</span>
           <span>{" | " + getDomain(story.url)}</span>

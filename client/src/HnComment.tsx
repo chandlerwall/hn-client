@@ -116,10 +116,9 @@ export class HnComment extends React.Component<HnCommentProps, HnCommentState> {
       return;
     }
 
-    console.log("click", e.clientX, e.pageX, e.screenX, window.innerWidth);
+    // TODO: add a check here to scroll to the next child on collapse.  need to store some refs
 
     const target = e.target as any;
-    console.log(target.offsetLeft);
 
     // allow some gutter expansion once shifted over
     const gutterRatio = this.state.expandSelf ? 0.85 : 0.9;
@@ -129,7 +128,6 @@ export class HnComment extends React.Component<HnCommentProps, HnCommentState> {
       this.props.canExpand &&
       (e.pageX + target.offsetLeft) / window.innerWidth > gutterRatio
     ) {
-      console.log("right gutter");
       this.setState({ expandSelf: !this.state.expandSelf });
     } else {
       this.setState({ isOpen: !this.state.isOpen });
