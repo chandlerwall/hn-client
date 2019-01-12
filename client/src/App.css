@@ -11,10 +11,6 @@ body {
   margin-top: 5px;
 }
 
-.comment-header {
-  font-weight: 450;
-}
-
 @media (min-width: 1200px) {
   .container {
     max-width: 800px;
@@ -36,6 +32,8 @@ body {
 
   border-left-width: 3px;
   border-left-style: solid;
+
+  background-color: white;
 }
 
 .navbar-brand {

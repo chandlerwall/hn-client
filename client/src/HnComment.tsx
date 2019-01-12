@@ -9,6 +9,8 @@ export interface HnCommentProps {
 
 interface HnCommentState {
   isOpen: boolean;
+
+  expandSelf: boolean;
 }
 
 const colors = [
@@ -25,7 +27,8 @@ export class HnComment extends React.Component<HnCommentProps, HnCommentState> {
     super(props);
 
     this.state = {
-      isOpen: true
+      isOpen: true,
+      expandSelf: false
     };
   }
 
@@ -72,14 +75,16 @@ export class HnComment extends React.Component<HnCommentProps, HnCommentState> {
         onClick={e => this.handleCardClick(e)}
         style={{
           paddingLeft: 12,
-          width: "100%",
+          marginLeft:
+            this.state.expandSelf && this.state.isOpen
+              ? -15 * this.props.depth
+              : 0,
+
           borderLeftColor:
-            this.props.depth < colors.length
-              ? colors[this.props.depth]
-              : "#bbb"
+            this.props.depth < colors.length ? colors[this.props.depth] : "#bbb"
         }}
       >
-        <p className="comment-header">
+        <p style={{ fontWeight: this.state.isOpen ? 450 : 300 }}>
           {comment.by}
           {" | "}
           {timeSince(comment.time)}
@@ -92,6 +97,7 @@ export class HnComment extends React.Component<HnCommentProps, HnCommentState> {
   }
   handleCardClick(e: React.MouseEvent<HTMLDivElement>): void {
     // this is to prevent other cards from collapsing too
+
     e.stopPropagation();
 
     // dont update state if click was A link
@@ -99,6 +105,22 @@ export class HnComment extends React.Component<HnCommentProps, HnCommentState> {
       return;
     }
 
-    this.setState({ isOpen: !this.state.isOpen });
+    console.log("click", e.clientX, e.pageX, e.screenX, window.innerWidth);
+
+    const target = e.target as any;
+    console.log(target.offsetLeft);
+
+    // allow some gutter expansion once shifted over
+    const gutterRatio = this.state.expandSelf ? 0.85 : 0.9;
+
+    if (
+      this.props.depth > 0 &&
+      (e.pageX + target.offsetLeft) / window.innerWidth > gutterRatio
+    ) {
+      console.log("right gutter");
+      this.setState({ expandSelf: !this.state.expandSelf });
+    } else {
+      this.setState({ isOpen: !this.state.isOpen });
+    }
   }
 }
