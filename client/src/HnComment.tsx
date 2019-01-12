@@ -5,11 +5,12 @@ import { timeSince } from "./timeSince";
 export interface HnCommentProps {
   comment: KidsObj3 | null;
   depth: number;
+
+  canExpand: boolean;
 }
 
 interface HnCommentState {
   isOpen: boolean;
-
   expandSelf: boolean;
 }
 
@@ -64,6 +65,7 @@ export class HnComment extends React.Component<HnCommentProps, HnCommentState> {
             key={comment.id + "-" + childComm.id}
             comment={childComm}
             depth={this.props.depth + 1}
+            canExpand={!this.state.expandSelf}
           />
         ))}
       </React.Fragment>
@@ -81,7 +83,16 @@ export class HnComment extends React.Component<HnCommentProps, HnCommentState> {
               : 0,
 
           borderLeftColor:
-            this.props.depth < colors.length ? colors[this.props.depth] : "#bbb"
+            this.props.depth < colors.length
+              ? colors[this.props.depth]
+              : "#bbb",
+
+          borderLeftWidth: this.state.expandSelf ? 6 : undefined,
+
+          borderRight: this.state.expandSelf
+            ? "1px solid" + colors[this.props.depth]
+            : undefined,
+          paddingRight: this.state.expandSelf ? 6 : undefined
         }}
       >
         <p style={{ fontWeight: this.state.isOpen ? 450 : 300 }}>
@@ -115,6 +126,7 @@ export class HnComment extends React.Component<HnCommentProps, HnCommentState> {
 
     if (
       this.props.depth > 0 &&
+      this.props.canExpand &&
       (e.pageX + target.offsetLeft) / window.innerWidth > gutterRatio
     ) {
       console.log("right gutter");

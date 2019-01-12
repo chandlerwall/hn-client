@@ -64,6 +64,7 @@ export class HnStoryPage extends React.Component<
             key={(comment || { id: 0 }).id}
             comment={comment}
             depth={0}
+            canExpand={true}
           />
         ))}
       </div>
