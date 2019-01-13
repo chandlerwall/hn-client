@@ -9,6 +9,10 @@ import { App } from "./App";
 import * as serviceWorker from "./serviceWorker";
 
 import * as Sentry from "@sentry/browser";
+import smoothscroll from "smoothscroll-polyfill";
+
+// kick off the polyfill!
+smoothscroll.polyfill();
 
 Sentry.init({
   dsn: "https://d8e8092157294c86b5014343cede60e6@sentry.io/1362584"

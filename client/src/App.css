@@ -36,6 +36,23 @@ body {
   background-color: white;
 }
 
+.collapsed {
+  animation: flash-background 2s;
+}
+
+@keyframes flash-background {
+  0% {
+    background: white;
+  }
+  /* Adding a step in the middle */
+  25% {
+    background: #ff6600;
+  }
+  100% {
+    background: white;
+  }
+}
+
 .navbar-brand {
   padding-right: 5px;
   padding-left: 5px;

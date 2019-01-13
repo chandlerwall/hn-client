@@ -4,6 +4,7 @@ import React from "react";
 import { DataLayer } from "./DataLayer";
 import { getDomain } from "./getDomain";
 import { HnComment } from "./HnComment";
+import { HnCommentList } from "./HnCommentList";
 import { timeSince } from "./timeSince";
 import { Link } from "react-router-dom";
 
@@ -69,14 +70,7 @@ export class HnStoryPage extends React.Component<
           />
         )}
 
-        {comments.map(comment => (
-          <HnComment
-            key={(comment || { id: 0 }).id}
-            comment={comment}
-            depth={0}
-            canExpand={true}
-          />
-        ))}
+        <HnCommentList childComments={comments} canExpand={true} depth={0} />
       </div>
     );
   }

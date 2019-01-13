@@ -2,11 +2,16 @@ import React from "react";
 
 import { timeSince } from "./timeSince";
 
+import classNames from "classnames";
+import { HnCommentList } from "./HnCommentList";
+
 export interface HnCommentProps {
   comment: KidsObj3 | null;
   depth: number;
 
   canExpand: boolean;
+
+  scrollToNextChild(): void;
 }
 
 interface HnCommentState {
@@ -24,6 +29,8 @@ const colors = [
 ];
 
 export class HnComment extends React.Component<HnCommentProps, HnCommentState> {
+  divRef: React.RefObject<HTMLDivElement>;
+
   constructor(props: HnCommentProps) {
     super(props);
 
@@ -31,6 +38,12 @@ export class HnComment extends React.Component<HnCommentProps, HnCommentState> {
       isOpen: true,
       expandSelf: false
     };
+
+    this.divRef = React.createRef();
+  }
+
+  getDivRef() {
+    return this.divRef.current!;
   }
 
   render() {
@@ -60,26 +73,24 @@ export class HnComment extends React.Component<HnCommentProps, HnCommentState> {
           dangerouslySetInnerHTML={{ __html: commentText }}
         />
 
-        {childComments.map(childComm => (
-          <HnComment
-            key={comment.id + "-" + childComm.id}
-            comment={childComm}
-            depth={this.props.depth + 1}
-            canExpand={!this.state.expandSelf}
-          />
-        ))}
+        <HnCommentList
+          childComments={childComments}
+          canExpand={!this.state.expandSelf}
+          depth={this.props.depth}
+        />
       </React.Fragment>
     );
 
     return (
       <div
-        className="bp3-card"
+        ref={this.divRef}
+        className={classNames("bp3-card", { collapsed: !this.state.isOpen })}
         onClick={e => this.handleCardClick(e)}
         style={{
           paddingLeft: 12,
           marginLeft:
             this.state.expandSelf && this.state.isOpen
-              ? -15 * this.props.depth
+              ? -15 * (this.props.depth-1)
               : 0,
 
           borderLeftColor:
@@ -116,8 +127,6 @@ export class HnComment extends React.Component<HnCommentProps, HnCommentState> {
       return;
     }
 
-    // TODO: add a check here to scroll to the next child on collapse.  need to store some refs
-
     const target = e.target as any;
 
     // allow some gutter expansion once shifted over
@@ -130,7 +139,9 @@ export class HnComment extends React.Component<HnCommentProps, HnCommentState> {
     ) {
       this.setState({ expandSelf: !this.state.expandSelf });
     } else {
-      this.setState({ isOpen: !this.state.isOpen });
+      this.setState({ isOpen: !this.state.isOpen }, () =>
+        this.props.scrollToNextChild()
+      );
     }
   }
 }
