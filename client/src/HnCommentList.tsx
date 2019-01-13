@@ -43,7 +43,17 @@ export class HnCommentList extends React.Component<HnCommentListProps, {}> {
               }
               const refObj = this.childRefs[nextSib.id].current!;
 
-              scrollIntoView(refObj.getDivRef(), {
+              console.log("ref", refObj === null);
+              console.log("ref divref", refObj.getDivRef() === null);
+
+              const divToScroll = refObj.getDivRef();
+
+              if (divToScroll === null) {
+                //TODO: figure out when/why this is null
+                return;
+              }
+
+              scrollIntoView(divToScroll, {
                 behavior: actions =>
                   // list is sorted from innermost (closest parent to your target) to outermost (often the document.body or viewport)
                   actions.forEach(({ el, top, left }) => {
