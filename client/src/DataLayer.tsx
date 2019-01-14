@@ -1,3 +1,4 @@
+import _ from "lodash";
 import React from "react";
 
 import { HnListSource } from "./App";
@@ -155,7 +156,12 @@ export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
       console.error(response);
       return;
     }
-    const data: HnItem[] = await response.json();
+    let data: HnItem[] = await response.json();
+
+    if (activeList !== HnListSource.Front) {
+      // flip score to get descending
+      data = _.sortBy<HnItem>(data, c => -c.score);
+    }
 
     // TODO: do not reload data on mount... use a button
 

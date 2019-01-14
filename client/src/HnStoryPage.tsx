@@ -3,7 +3,7 @@ import React from "react";
 
 import { DataLayer } from "./DataLayer";
 import { getDomain } from "./getDomain";
-import { HnComment } from "./HnComment";
+import { HnComment, isValidComment } from "./HnComment";
 import { HnCommentList } from "./HnCommentList";
 import { timeSince } from "./timeSince";
 import { Link } from "react-router-dom";
@@ -46,11 +46,11 @@ export class HnStoryPage extends React.Component<
         <a href={storyData.url}>{storyData.title}</a>
       );
 
-    const comments = storyData.kidsObj || [];
+    const comments = (storyData.kidsObj || []).filter(isValidComment);
 
     return (
       <div>
-        <h2>{storyLinkEl}</h2>
+        <h2 style={{ overflowWrap: "break-word" }}>{storyLinkEl}</h2>
         <h4>
           <span>{storyData.by}</span>
           <span>{" | "}</span>

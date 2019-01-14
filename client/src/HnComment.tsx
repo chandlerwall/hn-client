@@ -56,10 +56,7 @@ export class HnComment extends React.Component<HnCommentProps, HnCommentState> {
     const childComments = comment.kidsObj || [];
     const commentText = comment.text || "";
 
-    if (
-      comment.deleted &&
-      (comment.kidsObj === undefined || comment.kidsObj!.length === 0)
-    ) {
+    if (!isValidComment(comment)) {
       // kick out nothing if the comment was deleted and has no children
       return null;
     }
@@ -76,21 +73,20 @@ export class HnComment extends React.Component<HnCommentProps, HnCommentState> {
         <HnCommentList
           childComments={childComments}
           canExpand={!this.state.expandSelf}
-          depth={this.props.depth}
+          depth={this.props.depth + 1}
         />
       </React.Fragment>
     );
 
     return (
       <div
-        ref={this.divRef}
         className={classNames("bp3-card", { collapsed: !this.state.isOpen })}
         onClick={e => this.handleCardClick(e)}
         style={{
           paddingLeft: 12,
           marginLeft:
             this.state.expandSelf && this.state.isOpen
-              ? -15 * (this.props.depth-1)
+              ? -15 * this.props.depth
               : 0,
 
           borderLeftColor:
@@ -106,7 +102,10 @@ export class HnComment extends React.Component<HnCommentProps, HnCommentState> {
           paddingRight: this.state.expandSelf ? 6 : undefined
         }}
       >
-        <p style={{ fontWeight: this.state.isOpen ? 450 : 300 }}>
+        <p
+          style={{ fontWeight: this.state.isOpen ? 450 : 300 }}
+          ref={this.divRef}
+        >
           {comment.by}
           {" | "}
           {timeSince(comment.time)}
@@ -139,9 +138,23 @@ export class HnComment extends React.Component<HnCommentProps, HnCommentState> {
     ) {
       this.setState({ expandSelf: !this.state.expandSelf });
     } else {
-      this.setState({ isOpen: !this.state.isOpen }, () =>
-        this.props.scrollToNextChild()
-      );
+      const isOpen = !this.state.isOpen;
+      this.setState({ isOpen }, () => {
+        if (!isOpen) {
+          this.props.scrollToNextChild();
+        }
+      });
     }
   }
+}
+
+export function isValidComment(comment: KidsObj3 | null) {
+  if (comment === null) {
+    return false;
+  }
+  const isBad =
+    comment.deleted &&
+    (comment.kidsObj === undefined || comment.kidsObj!.length === 0);
+
+  return !isBad;
 }

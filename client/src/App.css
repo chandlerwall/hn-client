@@ -37,7 +37,7 @@ body {
 }
 
 .collapsed {
-  animation: flash-background 2s;
+  animation: flash-background 3s;
 }
 
 @keyframes flash-background {

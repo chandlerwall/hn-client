@@ -29,7 +29,7 @@ export class HnCommentList extends React.Component<HnCommentListProps, {}> {
           <HnComment
             key={childComm!.id}
             comment={childComm}
-            depth={this.props.depth + 1}
+            depth={this.props.depth}
             canExpand={this.props.canExpand}
             ref={this.childRefs[childComm!.id]}
             scrollToNextChild={() => {
