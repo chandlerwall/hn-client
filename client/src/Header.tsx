@@ -1,7 +1,7 @@
 import React from "react";
 import { Nav, Navbar, NavItem, Button, Glyphicon } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
-import { NavLink } from "react-router-dom";
+import { NavLink, Route } from "react-router-dom";
 
 interface HeaderProps {
   requestNewData(): void;
@@ -30,11 +30,20 @@ export class Header extends React.PureComponent<HeaderProps> {
           </LinkContainer>
         </Nav>
 
-        <Navbar.Form pullRight>
-          <Button bsStyle="primary" onClick={() => this.props.requestNewData()}>
-            <Glyphicon glyph="refresh" />
-          </Button>
-        </Navbar.Form>
+        <Route
+          render={({ location }) => {
+            return location.pathname.indexOf("/story") === -1 ? (
+              <Navbar.Form pullRight>
+                <Button
+                  bsStyle="primary"
+                  onClick={() => this.props.requestNewData()}
+                >
+                  <Glyphicon glyph="refresh" />
+                </Button>
+              </Navbar.Form>
+            ) : null;
+          }}
+        />
       </Navbar>
     );
   }
