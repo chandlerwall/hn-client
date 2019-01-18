@@ -38,7 +38,7 @@ export async function db_getTopStoryIds(reqType: TopStoriesType) {
         if (!shouldUpdate) {
           return resolve(doc.items);
         }
-      } 
+      }
 
       _getTopStories(reqType).then(ids => {
         let topstories: TopStories = {

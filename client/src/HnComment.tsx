@@ -1,9 +1,8 @@
+import classNames from "classnames";
 import React from "react";
 
-import { timeSince } from "./timeSince";
-
-import classNames from "classnames";
 import { HnCommentList } from "./HnCommentList";
+import { timeSince } from "./timeSince";
 
 export interface HnCommentProps {
   comment: KidsObj3 | null;
@@ -30,6 +29,18 @@ const colors = [
 
 export class HnComment extends React.Component<HnCommentProps, HnCommentState> {
   divRef: React.RefObject<HTMLDivElement>;
+
+  static getDerivedStateFromProps(
+    props: HnCommentProps,
+    state: HnCommentState
+  ) {
+    // if a parent expands, collapse this one
+    if (!props.canExpand) {
+      return { isOpen: state.isOpen, expandSelf: false };
+    }
+
+    return null;
+  }
 
   constructor(props: HnCommentProps) {
     super(props);
@@ -70,14 +81,18 @@ export class HnComment extends React.Component<HnCommentProps, HnCommentState> {
           dangerouslySetInnerHTML={{ __html: commentText }}
         />
 
-        <HnCommentList
-          childComments={childComments}
-          canExpand={!this.state.expandSelf}
-          depth={this.props.depth + 1}
-        />
+        {childComments.length > 0 && (
+          <HnCommentList
+            childComments={childComments}
+            canExpand={this.props.canExpand && !this.state.expandSelf}
+            depth={this.props.depth + 1}
+          />
+        )}
       </React.Fragment>
     );
 
+    const borderColor =
+      this.props.depth < colors.length ? colors[this.props.depth] : "#bbb";
     return (
       <div
         className={classNames("bp3-card", { collapsed: !this.state.isOpen })}
@@ -89,15 +104,12 @@ export class HnComment extends React.Component<HnCommentProps, HnCommentState> {
               ? -15 * this.props.depth
               : 0,
 
-          borderLeftColor:
-            this.props.depth < colors.length
-              ? colors[this.props.depth]
-              : "#bbb",
+          borderLeftColor: borderColor,
 
           borderLeftWidth: this.state.expandSelf ? 6 : undefined,
 
           borderRight: this.state.expandSelf
-            ? "1px solid" + colors[this.props.depth]
+            ? "1px solid" + borderColor
             : undefined,
           paddingRight: this.state.expandSelf ? 6 : undefined
         }}

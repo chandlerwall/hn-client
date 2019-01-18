@@ -14,11 +14,12 @@ export class HnListItem extends React.Component<HnStoryProps> {
     const story = this.props.data;
 
     const commentCount = (
-      <Link to={"/story/" + story.id}>
-        <span>
-          {" | "} <Glyphicon glyph="comment" /> {story.descendants}
-        </span>
-      </Link>
+      <React.Fragment>
+        {" | "}
+        <Link to={"/story/" + story.id}>
+          <Glyphicon glyph="comment" /> {story.descendants}
+        </Link>
+      </React.Fragment>
     );
 
     const storyLinkEl =

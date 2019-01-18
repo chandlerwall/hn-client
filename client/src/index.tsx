@@ -14,6 +14,7 @@ import smoothscroll from "smoothscroll-polyfill";
 // kick off the polyfill!
 smoothscroll.polyfill();
 
+// TODO: get rid of this call eventually
 Sentry.init({
   dsn: "https://d8e8092157294c86b5014343cede60e6@sentry.io/1362584"
 });

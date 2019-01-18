@@ -141,6 +141,13 @@ class _App extends React.Component<AppPageProps, AppState> {
             )}
           />
         </Switch>
+        <span
+          onClick={() => {
+            throw new Error("testing Sentry");
+          }}
+        >
+          test
+        </span>
       </div>
     );
   }

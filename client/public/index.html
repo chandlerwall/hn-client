@@ -26,6 +26,15 @@
   </head>
   <body>
     <noscript> You need to enable JavaScript to run this app. </noscript>
+    <script
+      src="https://browser.sentry-cdn.com/4.5.2/bundle.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <script type="text/javascript">
+      Sentry.init({
+        dsn: "https://d8e8092157294c86b5014343cede60e6@sentry.io/1362584"
+      });
+    </script>
     <div id="root"></div>
     <!--
       This HTML file is a template.

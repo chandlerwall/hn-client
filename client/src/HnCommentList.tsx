@@ -1,6 +1,8 @@
+import computeScrollIntoView from "compute-scroll-into-view";
+import _ from "lodash";
 import React from "react";
+
 import { HnComment } from "./HnComment";
-import scrollIntoView from "scroll-into-view-if-needed";
 
 interface HnCommentListProps {
   childComments: Array<KidsObj3 | null>;
@@ -36,36 +38,46 @@ export class HnCommentList extends React.Component<HnCommentListProps, {}> {
               // check if next is real
               // HACK: nothing here is pretty... bouncing around refs to get the DIV to scroll to
               // scroll to self if no siblings around
-              const nextSib = validChildren[index + 1] || validChildren[index];
+              let nextSib = validChildren[index + 1];
+              const meEl = validChildren[index];
+
+              if (meEl === null) {
+                return;
+              }
 
               if (nextSib === undefined || nextSib === null) {
-                return;
+                nextSib = meEl;
               }
+
               const refObj = this.childRefs[nextSib.id].current!;
-
-              console.log("ref", refObj === null);
-              console.log("ref divref", refObj.getDivRef() === null);
-
               const divToScroll = refObj.getDivRef();
 
-              if (divToScroll === null) {
-                //TODO: figure out when/why this is null
-                return;
-              }
-
-              scrollIntoView(divToScroll, {
-                behavior: actions =>
-                  // list is sorted from innermost (closest parent to your target) to outermost (often the document.body or viewport)
-                  actions.forEach(({ el, top, left }) => {
-                    // implement the scroll anyway you want
-                    window.scrollTo({
-                      top: top - 80,
-                      behavior: "smooth" // Optional, adds animation)
-                    });
-                  }),
+              const actions = computeScrollIntoView(divToScroll, {
                 block: "nearest",
                 inline: "nearest",
                 scrollMode: "if-needed"
+              });
+
+              const refObjMe = this.childRefs[meEl.id].current!;
+              const divToScrollMe = refObjMe.getDivRef();
+
+              const actionsMe = computeScrollIntoView(divToScrollMe, {
+                block: "nearest",
+                inline: "nearest",
+                scrollMode: "if-needed"
+              });
+
+              if (actions.length == 0 && actionsMe.length == 0) {
+                return;
+              }
+
+              // the goal here is to determine if the next sibling or the collapsed header is hidden
+              // if either is not visible, it will scroll to the next sib (or collapsed if no sibs)
+
+              // TODO: consider if this 80 should be less if no siblings
+              window.scrollTo({
+                top: divToScroll.offsetTop - 80,
+                behavior: "smooth" // Optional, adds animation)
               });
             }}
           />

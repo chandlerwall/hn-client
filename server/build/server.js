@@ -83,7 +83,8 @@ var Server = /** @class */ (function () {
                 }
             });
         }); });
-        app.get("*", function (req, res) {
+        app.get("/", function (req, res) {
+            // 404 for the rest?
             res.sendFile(path.join(__dirname, "../../client/build/index.html"));
         });
         var port = process.env.PORT || 3001;

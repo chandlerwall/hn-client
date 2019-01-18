@@ -52,7 +52,8 @@ export class Server {
       res.json({ error: "story not found" });
     });
 
-    app.get("*", (req, res) => {
+    app.get("/", (req, res) => {
+      // 404 for the rest?
       res.sendFile(path.join(__dirname, "../../client/build/index.html"));
     });
 
