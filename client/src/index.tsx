@@ -1,15 +1,15 @@
 import "bootstrap/dist/css/bootstrap-theme.css";
 import "bootstrap/dist/css/bootstrap.css";
 
+import * as Sentry from "@sentry/browser";
 import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter, Route } from "react-router-dom";
+import smoothscroll from "smoothscroll-polyfill";
 
 import { App } from "./App";
+import { ErrorBoundary } from "./ErrorBoundary";
 import * as serviceWorker from "./serviceWorker";
-
-import * as Sentry from "@sentry/browser";
-import smoothscroll from "smoothscroll-polyfill";
 
 // kick off the polyfill!
 smoothscroll.polyfill();
@@ -22,7 +22,9 @@ Sentry.init({
 ReactDOM.render(
   <BrowserRouter>
     <Route path={"/:page?"}>
-      <App />
+      <ErrorBoundary>
+        <App />
+      </ErrorBoundary>
     </Route>
   </BrowserRouter>,
   document.getElementById("root")

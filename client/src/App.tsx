@@ -73,19 +73,6 @@ class _App extends React.Component<AppPageProps, AppState> {
     });
   }
 
-  componentDidCatch(error: any, errorInfo: any) {
-    this.setState({ error });
-    Sentry.withScope(scope => {
-      Object.keys(errorInfo).forEach(key => {
-        scope.setExtra(key, errorInfo[key]);
-      });
-      Sentry.captureException(error);
-    });
-
-    // clear out all localForage stuff to be save
-    localForage.clear();
-  }
-
   render() {
     console.log("render state", this.state);
 
