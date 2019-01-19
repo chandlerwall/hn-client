@@ -1,7 +1,5 @@
 import "./App.css";
 
-import * as Sentry from "@sentry/browser";
-import localForage from "localforage";
 import _ from "lodash";
 import React, { RefObject } from "react";
 import { Route, RouteComponentProps, Switch, withRouter } from "react-router";
@@ -128,13 +126,6 @@ class _App extends React.Component<AppPageProps, AppState> {
             )}
           />
         </Switch>
-        <span
-          onClick={() => {
-            throw new Error("testing Sentry");
-          }}
-        >
-          test
-        </span>
       </div>
     );
   }
