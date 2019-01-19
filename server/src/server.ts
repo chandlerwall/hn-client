@@ -3,7 +3,11 @@ import * as compression from "compression";
 import * as express from "express";
 import * as path from "path";
 
-import { _getFullDataForIds, db_getTopStoryIds } from "./database";
+import {
+  _getFullDataForIds,
+  db_getTopStoryIds,
+  db_clearOldStories
+} from "./database";
 import { ItemExt, TopStoriesParams, TopStoriesType } from "./interfaces";
 
 const cachedData: { [key: string]: ItemExt[] } = {};
@@ -81,7 +85,7 @@ async function updateData() {
     updateList.push("week");
   }
   if (index % (6 * 24) === 0) {
-    // every 3 days
+    // every 24 hours
     updateList.push("month");
     index = 1;
   }
@@ -94,6 +98,20 @@ async function updateData() {
     const results = await db_getTopStoryIds(storyType).then(ids => {
       return _getFullDataForIds(ids);
     });
+
+    // clear out old stories as needed -- will happen daily
+    if (storyType === "month") {
+      console.log("clearing old stories");
+      const idsToKeep = new Set();
+      Object.keys(cachedData).forEach(key => {
+        cachedData[key].forEach(story => {
+          idsToKeep.add(story.id);
+        });
+      });
+
+      const removeCount = await db_clearOldStories(Array.from(idsToKeep));
+      console.log("removed stories: " + removeCount);
+    }
 
     // save result to local cache... will be served
     cachedData[storyType] = results;

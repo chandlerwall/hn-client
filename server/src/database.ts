@@ -25,6 +25,23 @@ export class Database {
   }
 }
 
+export async function db_clearOldStories(idsToKeep: number[]) {
+  return new Promise<number>((resolve, reject) => {
+    Database.get().remove({ planet: { $nin: idsToKeep } }, function(
+      err,
+      numRemoved
+    ) {
+      if (err) {
+        reject(err);
+        return;
+      }
+
+      resolve(numRemoved);
+      return;
+    });
+  });
+}
+
 export async function db_getTopStoryIds(reqType: TopStoriesType) {
   return new Promise<number[]>((resolve, reject) => {
     Database.get().findOne<TopStories>({ id: reqType }, (err, doc) => {
