@@ -113,13 +113,13 @@ function updateData() {
                 updateList.push("week");
             }
             if (index % (6 * 24) === 0) {
-                // every 3 days
+                // every 24 hours
                 updateList.push("month");
                 index = 1;
             }
             console.log(new Date(), "refresh interval hit");
             updateList.forEach(function (storyType) { return __awaiter(_this, void 0, void 0, function () {
-                var results;
+                var results, idsToKeep_1, removeCount;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -129,6 +129,20 @@ function updateData() {
                                 })];
                         case 1:
                             results = _a.sent();
+                            if (!(storyType === "month")) return [3 /*break*/, 3];
+                            console.log("clearing old stories");
+                            idsToKeep_1 = new Set();
+                            Object.keys(cachedData).forEach(function (key) {
+                                cachedData[key].forEach(function (story) {
+                                    idsToKeep_1.add(story.id);
+                                });
+                            });
+                            return [4 /*yield*/, database_1.db_clearOldStories(Array.from(idsToKeep_1))];
+                        case 2:
+                            removeCount = _a.sent();
+                            console.log("removed stories: " + removeCount);
+                            _a.label = 3;
+                        case 3:
                             // save result to local cache... will be served
                             cachedData[storyType] = results;
                             console.log(new Date(), "update complete", storyType);

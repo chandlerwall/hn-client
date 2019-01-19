@@ -65,6 +65,23 @@ var Database = /** @class */ (function () {
     return Database;
 }());
 exports.Database = Database;
+function db_clearOldStories(idsToKeep) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            return [2 /*return*/, new Promise(function (resolve, reject) {
+                    Database.get().remove({ planet: { $nin: idsToKeep } }, function (err, numRemoved) {
+                        if (err) {
+                            reject(err);
+                            return;
+                        }
+                        resolve(numRemoved);
+                        return;
+                    });
+                })];
+        });
+    });
+}
+exports.db_clearOldStories = db_clearOldStories;
 function db_getTopStoryIds(reqType) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
