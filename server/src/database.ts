@@ -27,18 +27,19 @@ export class Database {
 
 export async function db_clearOldStories(idsToKeep: number[]) {
   return new Promise<number>((resolve, reject) => {
-    Database.get().remove({ planet: { $nin: idsToKeep } }, function(
-      err,
-      numRemoved
-    ) {
-      if (err) {
-        reject(err);
+    Database.get().remove(
+      { id: { $nin: idsToKeep } },
+      { multi: true },
+      function(err, numRemoved) {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        resolve(numRemoved);
         return;
       }
-
-      resolve(numRemoved);
-      return;
-    });
+    );
   });
 }
 
