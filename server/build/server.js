@@ -119,7 +119,7 @@ function updateData() {
             }
             console.log(new Date(), "refresh interval hit");
             updateList.forEach(function (storyType) { return __awaiter(_this, void 0, void 0, function () {
-                var results, idsToKeep_1, removeCount;
+                var results, idsToKeep_1, idArr, removeCount;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -137,7 +137,9 @@ function updateData() {
                                     idsToKeep_1.add(story.id);
                                 });
                             });
-                            return [4 /*yield*/, database_1.db_clearOldStories(Array.from(idsToKeep_1))];
+                            idArr = Array.from(idsToKeep_1);
+                            console.log("keeping IDs", idArr);
+                            return [4 /*yield*/, database_1.db_clearOldStories(idArr)];
                         case 2:
                             removeCount = _a.sent();
                             console.log("removed stories: " + removeCount);

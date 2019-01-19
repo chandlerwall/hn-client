@@ -36,6 +36,9 @@ export async function db_clearOldStories(idsToKeep: number[]) {
           return;
         }
 
+        // reduce size on disk
+        Database.get().persistence.compactDatafile();
+
         resolve(numRemoved);
         return;
       }

@@ -69,11 +69,13 @@ function db_clearOldStories(idsToKeep) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             return [2 /*return*/, new Promise(function (resolve, reject) {
-                    Database.get().remove({ planet: { $nin: idsToKeep } }, function (err, numRemoved) {
+                    Database.get().remove({ id: { $nin: idsToKeep } }, { multi: true }, function (err, numRemoved) {
                         if (err) {
                             reject(err);
                             return;
                         }
+                        // reduce size on disk
+                        Database.get().persistence.compactDatafile();
                         resolve(numRemoved);
                         return;
                     });

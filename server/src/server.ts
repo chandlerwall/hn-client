@@ -109,7 +109,9 @@ async function updateData() {
         });
       });
 
-      const removeCount = await db_clearOldStories(Array.from(idsToKeep));
+      const idArr = Array.from(idsToKeep);
+      console.log("keeping IDs", idArr);
+      const removeCount = await db_clearOldStories(idArr);
       console.log("removed stories: " + removeCount);
     }
 
