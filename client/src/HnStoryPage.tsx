@@ -3,10 +3,9 @@ import React from "react";
 
 import { DataLayer } from "./DataLayer";
 import { getDomain } from "./getDomain";
-import { HnComment, isValidComment } from "./HnComment";
+import { isValidComment } from "./HnComment";
 import { HnCommentList } from "./HnCommentList";
 import { timeSince } from "./timeSince";
-import { Link } from "react-router-dom";
 
 interface HnStoryPageState {
   data: HnItem | undefined;
