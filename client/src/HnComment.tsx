@@ -64,7 +64,7 @@ export class HnComment extends React.Component<HnCommentProps, HnCommentState> {
       return null;
     }
 
-    const childComments = comment.kidsObj || [];
+    const childComments = (comment.kidsObj || []).filter(isValidComment);
     const commentText = comment.text || "";
 
     if (!isValidComment(comment)) {
