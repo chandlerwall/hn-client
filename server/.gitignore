@@ -4,6 +4,9 @@ node_modules
 # Build directories
 build
 
+# Local data
+data_test.db
+
 # Logs
 logs
 *.log
