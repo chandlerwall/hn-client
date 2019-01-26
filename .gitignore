@@ -1,17 +1,8 @@
-tokens.json
-data.db
-*.db
-
-# See https://help.github.com/ignore-files/ for more about ignoring files.
+# IDE
+.idea
 
 # dependencies
-*/node_modules
-
-# testing
-*/coverage
-
-# production
-
+node_modules
 
 # misc
 .DS_Store
@@ -20,6 +11,9 @@ data.db
 .env.test.local
 .env.production.local
 
+# Logs
+logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
