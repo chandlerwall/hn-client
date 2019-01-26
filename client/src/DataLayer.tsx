@@ -136,19 +136,20 @@ export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
 
   public async loadData(activeList: HnListSource) {
     console.log("loading data");
+    const API_HOST = "https://hn.byroni.us";
     let url = "";
     switch (activeList) {
       case HnListSource.Front:
-        url = "/topstories/topstories";
+        url = `${API_HOST}/topstories/topstories`;
         break;
       case HnListSource.Day:
-        url = "/topstories/day";
+        url = `${API_HOST}/topstories/day`;
         break;
       case HnListSource.Week:
-        url = "/topstories/week";
+        url = `${API_HOST}/topstories/week`;
         break;
       case HnListSource.Month:
-        url = "/topstories/month";
+        url = `${API_HOST}/topstories/month`;
         break;
     }
     const response = await fetch(url);
