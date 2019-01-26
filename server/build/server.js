@@ -39,6 +39,7 @@ var bodyParser = require("body-parser");
 var compression = require("compression");
 var express = require("express");
 var path = require("path");
+var cors = require("cors");
 var database_1 = require("./database");
 var cachedData = {};
 var Server = /** @class */ (function () {
@@ -49,6 +50,7 @@ var Server = /** @class */ (function () {
         var app = express();
         app.use(bodyParser.json());
         app.use(compression());
+        app.use(cors());
         // this assumes that the app is running in server/build
         app.use(express.static(path.join(__dirname, "../../client/build")));
         app.get("/topstories/:type", function (req, res) {
