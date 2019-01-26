@@ -1,8 +1,9 @@
 import * as functions from "firebase-functions";
+import app from "./api";
 
-// Start writing Firebase Functions
-// https://firebase.google.com/docs/functions/typescript
-
-export const helloWorld = functions.https.onRequest((request, response) => {
+export const helloWorld = functions.https.onRequest(async (request, response) => {
   response.send("Hello from Firebase!");
 });
+
+// Expose Express API as a single Cloud Function:
+export const api = functions.https.onRequest(app);
