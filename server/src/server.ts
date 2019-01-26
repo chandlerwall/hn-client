@@ -2,6 +2,7 @@ import * as bodyParser from "body-parser";
 import * as compression from "compression";
 import * as express from "express";
 import * as path from "path";
+import * as cors from "cors";
 
 import {
   _getFullDataForIds,
@@ -18,6 +19,8 @@ export class Server {
 
     app.use(bodyParser.json());
     app.use(compression());
+
+    app.use(cors());
 
     // this assumes that the app is running in server/build
     app.use(express.static(path.join(__dirname, "../../client/build")));
