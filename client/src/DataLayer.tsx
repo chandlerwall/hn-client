@@ -5,13 +5,14 @@ import { HnListSource } from "./App";
 import { LocalStorageWrapper } from "./LocalStorageWrapper";
 
 interface DataLayerState {
-  frontItems: HnItem[];
+  allItems: HnItem[];
 
-  dayItems: HnItem[];
+  currentLists: DataList[];
+}
 
-  weekItems: HnItem[];
-
-  monthItems: HnItem[];
+export interface DataList {
+  key: HnListSource;
+  stories: number[]; // will be an array of IDs
 }
 
 interface DataLayerProps {
@@ -24,10 +25,8 @@ export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
     super(props);
 
     this.state = {
-      dayItems: [],
-      frontItems: [],
-      monthItems: [],
-      weekItems: []
+      allItems: [],
+      currentLists: []
     };
   }
 
@@ -37,48 +36,21 @@ export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
       <React.Fragment>
         <LocalStorageWrapper<HnItem[]>
           dataDidUpdate={item => this.updateNewItems(item, HnListSource.Front)}
-          activeItem={this.state.frontItems}
-          storageName="HN-ITEMS"
+          activeItem={this.state.allItems}
+          storageName="HN-ALL-ITEMS"
         />
 
-        <LocalStorageWrapper<HnItem[]>
-          dataDidUpdate={item => this.updateNewItems(item, HnListSource.Day)}
-          activeItem={this.state.dayItems}
-          storageName="HN-DAY-ITEMS"
-        />
-
-        <LocalStorageWrapper<HnItem[]>
-          dataDidUpdate={item => this.updateNewItems(item, HnListSource.Week)}
-          activeItem={this.state.weekItems}
-          storageName="HN-WEEK-ITEMS"
-        />
-
-        <LocalStorageWrapper<HnItem[]>
-          dataDidUpdate={item => this.updateNewItems(item, HnListSource.Month)}
-          activeItem={this.state.monthItems}
-          storageName="HN-MONTH-ITEMS"
+        <LocalStorageWrapper<DataList[]>
+          dataDidUpdate={item => console.log("item list did update", item)}
+          activeItem={this.state.currentLists}
+          storageName="HN-DATA-LISTS"
         />
       </React.Fragment>
     );
   }
 
   async getStoryData(id: number) {
-    let item = this.state.frontItems.find(c => c.id === id);
-    if (item !== undefined) {
-      return item;
-    }
-
-    item = this.state.dayItems.find(c => c.id === id);
-    if (item !== undefined) {
-      return item;
-    }
-
-    item = this.state.weekItems.find(c => c.id === id);
-    if (item !== undefined) {
-      return item;
-    }
-
-    item = this.state.monthItems.find(c => c.id === id);
+    let item = this.state.allItems.find(c => c.id === id);
     if (item !== undefined) {
       return item;
     }
@@ -109,29 +81,38 @@ export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
 
   getPageData(page: string | undefined) {
     // TODO: add loading step if data is missing -- figure out how to trigger refresh
-    console.log("getpage state", this.state);
-    switch (page) {
-      case "day":
-        if (this.state.dayItems.length === 0) {
-          this.loadData(HnListSource.Day);
-        }
-        return this.state.dayItems || [];
-      case "week":
-        if (this.state.weekItems.length === 0) {
-          this.loadData(HnListSource.Week);
-        }
-        return this.state.weekItems || [];
-      case "month":
-        if (this.state.monthItems.length === 0) {
-          this.loadData(HnListSource.Month);
-        }
-        return this.state.monthItems || [];
-      default:
-        if (this.state.frontItems.length === 0) {
-          this.loadData(HnListSource.Front);
-        }
-        return this.state.frontItems || [];
+
+    if (page === "" || page === undefined) {
+      page = "front";
     }
+
+    const pageToSourceMapping: { [key: string]: HnListSource } = {
+      day: HnListSource.Day,
+      week: HnListSource.Week,
+      month: HnListSource.Month,
+      front: HnListSource.Front
+    };
+
+    const source = pageToSourceMapping[page];
+
+    if (source === undefined) {
+      console.error("unknown page -> source map");
+      return [];
+    }
+
+    const idsToLoad = this.state.currentLists.find(c => c.key === source);
+
+    if (idsToLoad === undefined) {
+      // TODO: this needs to fire off an update
+      console.error("bad key given?");
+      return [];
+    }
+
+    const dataOut = idsToLoad.stories
+      .map(id => this.state.allItems.find(c => c.id === id))
+      .filter(c => c !== undefined) as HnItem[];
+
+    return dataOut;
   }
 
   public async loadData(activeList: HnListSource) {
@@ -180,21 +161,57 @@ export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
       data = [];
     }
 
-    switch (listType) {
-      case HnListSource.Front:
-        this.setState({ frontItems: data });
-        break;
-      case HnListSource.Day:
-        this.setState({ dayItems: data });
-        break;
-      case HnListSource.Week:
-        this.setState({ weekItems: data });
-        break;
-      case HnListSource.Month:
-        this.setState({ monthItems: data });
-        break;
+    // replace the list with the new IDs
+    const newList = data.map(c => c.id);
+
+    const newDataList = _.cloneDeep(this.state.currentLists);
+
+    let listToUpdate = newDataList.find(c => c.key === listType);
+
+    if (listToUpdate === undefined) {
+      newDataList.push({
+        key: listType,
+        stories: newList
+      });
+    } else {
+      listToUpdate.stories = newList;
     }
 
-    this.props.provideNewItems(data, listType);
+    // get all items... replace those whose data is newer in this version
+
+    const newAllItems = _.cloneDeep(this.state.allItems);
+
+    const storiesToReturn: HnItem[] = [];
+
+    data.forEach(newStory => {
+      const existingStoryIndex = newAllItems.findIndex(
+        c => c.id === newStory.id
+      );
+
+      // add the story if it is new
+      if (existingStoryIndex === -1) {
+        newAllItems.push(newStory);
+        storiesToReturn.push(newStory);
+        return;
+      }
+
+      // check the data if already found
+      const existingStory = newAllItems[existingStoryIndex];
+      if (existingStory.lastUpdated > newStory.lastUpdated) {
+        storiesToReturn.push(existingStory);
+        return;
+      }
+
+      newAllItems[existingStoryIndex] = newStory;
+      storiesToReturn.push(newStory);
+
+      // new story is actually newer... replace its data
+    });
+
+    // update otherwise
+
+    this.setState({ allItems: newAllItems, currentLists: newDataList }, () => {
+      this.props.provideNewItems(storiesToReturn, listType);
+    });
   }
 }
