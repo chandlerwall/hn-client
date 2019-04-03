@@ -72,7 +72,7 @@ class _App extends React.Component<AppPageProps, AppState> {
   }
 
   render() {
-    console.log("render state", this.state);
+    console.log("render state", this.state, this.dataLayer);
 
     if (this.state.error !== undefined) {
       return (

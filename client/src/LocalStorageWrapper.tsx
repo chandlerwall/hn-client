@@ -1,7 +1,7 @@
-import _ from "lodash";
-import React from "react";
-import LZString from "lz-string";
 import localForage from "localforage";
+import _ from "lodash";
+import LZString from "lz-string";
+import React from "react";
 
 export interface LocalStorageWrapperProps<TDataType> {
   storageName: string;
@@ -73,9 +73,10 @@ export class LocalStorageWrapper<TDataType> extends React.Component<
       const strToStore = JSON.stringify(this.props.activeItem);
       const strToStoreCompressed = LZString.compress(strToStore);
       localForage.setItem(this.props.storageName, strToStoreCompressed);
-      this.setState({ item: this.props.activeItem }, () =>
-        this.props.dataDidUpdate(this.props.activeItem)
-      );
+      this.setState({ item: this.props.activeItem }, () => {
+        console.log("updating data after a save?");
+        this.props.dataDidUpdate(this.props.activeItem);
+      });
     }
   }
 }

@@ -6,8 +6,9 @@ import { LocalStorageWrapper } from "./LocalStorageWrapper";
 
 interface DataLayerState {
   allItems: HnItem[];
-
   currentLists: DataList[];
+
+  isLoadingFresh: boolean;
 }
 
 export interface DataList {
@@ -26,7 +27,8 @@ export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
 
     this.state = {
       allItems: [],
-      currentLists: []
+      currentLists: [],
+      isLoadingFresh: false
     };
   }
 
@@ -35,13 +37,17 @@ export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
     return (
       <React.Fragment>
         <LocalStorageWrapper<HnItem[]>
-          dataDidUpdate={item => this.updateNewItems(item, HnListSource.Front)}
+          dataDidUpdate={allItems =>
+            this.processDataFromLocalStorage(allItems, this.state.currentLists)
+          }
           activeItem={this.state.allItems}
           storageName="HN-ALL-ITEMS"
         />
 
         <LocalStorageWrapper<DataList[]>
-          dataDidUpdate={item => console.log("item list did update", item)}
+          dataDidUpdate={currentLists =>
+            this.processDataFromLocalStorage(this.state.allItems, currentLists)
+          }
           activeItem={this.state.currentLists}
           storageName="HN-DATA-LISTS"
         />
@@ -82,6 +88,8 @@ export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
   getPageData(page: string | undefined) {
     // TODO: add loading step if data is missing -- figure out how to trigger refresh
 
+    console.log("getpagedata", page, this.state);
+
     if (page === "" || page === undefined) {
       page = "front";
     }
@@ -104,7 +112,8 @@ export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
 
     if (idsToLoad === undefined) {
       // TODO: this needs to fire off an update
-      console.error("bad key given?");
+      console.log("no ids to load...");
+      this.loadData(source);
       return [];
     }
 
@@ -149,13 +158,52 @@ export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
     // TODO: take that list of items and set it equal to the current list
     // TODO: update the items with a merge of sorts instead of overwriting
 
-    console.log("hn items", data);
+    console.log("hn items from server", data);
 
     this.updateNewItems(data, activeList);
   }
 
+  processDataFromLocalStorage(
+    allItems: HnItem[] | undefined,
+    allLists: DataList[] | undefined
+  ) {
+    // all items come through
+    // the lists come through also
+
+    console.log("fresh data from local storage", allItems, allLists);
+
+    // these state updates ensure that the data is available for next pass
+    if (allItems !== undefined) {
+      this.setState({ allItems });
+    }
+
+    if (allLists !== undefined) {
+      this.setState({ currentLists: allLists });
+    }
+
+    if (allItems === undefined || allLists === undefined) {
+      if (!this.state.isLoadingFresh) {
+        this.loadData(HnListSource.Front);
+        this.setState({ isLoadingFresh: true });
+      }
+      return;
+    }
+
+    // iterate the lists
+
+    allLists.forEach(list => {
+      const items = list.stories
+        .map(id => allItems.find(c => c.id === id))
+        .filter(c => c !== undefined) as HnItem[];
+
+      this.props.provideNewItems(items, list.key);
+    });
+
+    // send out update caommands to each one
+  }
+
   updateNewItems(data: HnItem[] | undefined, listType: HnListSource): void {
-    console.log("new items2", data, listType);
+    console.log("items coming from server", data, listType);
 
     if (data === undefined) {
       data = [];

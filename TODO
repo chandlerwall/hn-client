@@ -1,5 +1,4 @@
 Top Priorities:
-    ☐ Change out the client storage to a single array of stories and then lists of stories for each type
     ☐ Server side should also maintain a single array of data
     ☐ Allow the app to change the page title - `HN: ${title}`
     ☐ Add a loading indicator when fetching data
@@ -13,3 +12,6 @@ Other options:
     ☐ Ability to save stories for later?
     ☐ Link to send stories to pocket?
     ☐ Link to send comments page to Pocket (or HN app?)
+
+Archive:
+  ✔ Change out the client storage to a single array of stories and then lists of stories for each type @done(19-04-01 23:36) @project(Top Priorities)

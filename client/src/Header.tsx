@@ -1,5 +1,5 @@
 import React from "react";
-import { Nav, Navbar, NavItem, Button, Glyphicon } from "react-bootstrap";
+import { Button, Glyphicon, Nav, Navbar, NavItem } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { NavLink, Route } from "react-router-dom";
 
