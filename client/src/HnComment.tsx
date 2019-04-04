@@ -98,7 +98,7 @@ export class HnComment extends React.Component<HnCommentProps, HnCommentState> {
         className={classNames("bp3-card", { collapsed: !this.state.isOpen })}
         onClick={e => this.handleCardClick(e)}
         style={{
-          paddingLeft: 12,
+          paddingLeft: 12 + Math.max(4 - this.props.depth),
           marginLeft:
             this.state.expandSelf && this.state.isOpen
               ? -15 * this.props.depth
