@@ -2,9 +2,11 @@ import React from "react";
 import { Button, Glyphicon, Nav, Navbar, NavItem } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { NavLink, Route } from "react-router-dom";
+import { Spinner } from "@blueprintjs/core";
 
 interface HeaderProps {
   requestNewData(): void;
+  isLoading: boolean;
 }
 
 export class Header extends React.PureComponent<HeaderProps> {
@@ -30,20 +32,23 @@ export class Header extends React.PureComponent<HeaderProps> {
           </LinkContainer>
         </Nav>
 
-        <Route
-          render={({ location }) => {
-            return location.pathname.indexOf("/story") === -1 ? (
-              <Navbar.Form pullRight>
-                <Button
-                  bsStyle="primary"
-                  onClick={() => this.props.requestNewData()}
-                >
-                  <Glyphicon glyph="refresh" />
-                </Button>
-              </Navbar.Form>
-            ) : null;
-          }}
-        />
+        <Navbar.Form pullRight>
+          {this.props.isLoading && <Spinner size={32} />}
+          {!this.props.isLoading && (
+            <Route
+              render={({ location }) => {
+                return location.pathname.indexOf("/story") === -1 ? (
+                  <Button
+                    bsStyle="primary"
+                    onClick={() => this.props.requestNewData()}
+                  >
+                    <Glyphicon glyph="refresh" />
+                  </Button>
+                ) : null;
+              }}
+            />
+          )}
+        </Navbar.Form>
       </Navbar>
     );
   }

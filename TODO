@@ -1,6 +1,5 @@
 Top Priorities:
     ☐ Server side should also maintain a single array of data
-    ☐ Add a loading indicator when fetching data
     ☐ Keep track of comment collapse state when returning to pages?
     
 Other options:
@@ -13,5 +12,6 @@ Other options:
     ☐ Link to send comments page to Pocket (or HN app?)
 
 Archive:
+  ✔ Add a loading indicator when fetching data @done(19-04-03 23:22) @project(Top Priorities)
   ✔ Allow the app to change the page title - `HN: ${title}` @done(19-04-03 23:12) @project(Top Priorities)
   ✔ Change out the client storage to a single array of stories and then lists of stories for each type @done(19-04-01 23:36) @project(Top Priorities)

@@ -1,6 +1,8 @@
 import "bootstrap/dist/css/bootstrap-theme.css";
 import "bootstrap/dist/css/bootstrap.css";
 
+import "@blueprintjs/core/lib/css/blueprint.css"
+
 import * as Sentry from "@sentry/browser";
 import localForage from "localforage";
 import React from "react";

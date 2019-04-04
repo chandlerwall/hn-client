@@ -47,7 +47,8 @@ class _App extends React.Component<AppPageProps, AppState> {
       items: [],
       allItems: [],
       activeList: HnListSource.Front,
-      error: undefined
+      error: undefined,
+      isLoading: false
     };
 
     this.dataLayer = React.createRef();
@@ -90,12 +91,14 @@ class _App extends React.Component<AppPageProps, AppState> {
         <DataLayer
           ref={this.dataLayer}
           provideNewItems={this.newItemsProvided}
+          updateIsLoadingStatus={isLoading => this.setState({ isLoading })}
         />
 
         <Header
           requestNewData={() => {
             this.dataLayer.current!.loadData(this.state.activeList);
           }}
+          isLoading={this.state.isLoading}
         />
 
         <Switch>
@@ -153,4 +156,6 @@ interface AppState {
   error: any;
 
   activeList: HnListSource;
+
+  isLoading: boolean;
 }

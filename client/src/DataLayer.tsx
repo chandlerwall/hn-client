@@ -18,6 +18,7 @@ export interface DataList {
 
 interface DataLayerProps {
   provideNewItems(items: HnItem[], listType: HnListSource): void;
+  updateIsLoadingStatus(newStatus: boolean): void;
 }
 
 export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
@@ -68,6 +69,7 @@ export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
   public async getStoryFromServer(id: number) {
     let url = "/api/story/" + id;
 
+    this.props.updateIsLoadingStatus(true);
     const response = await fetch(url);
     if (!response.ok) {
       console.error(response);
@@ -77,11 +79,13 @@ export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
 
     if ("error" in data) {
       console.error(data);
+      this.props.updateIsLoadingStatus(false);
       return undefined;
     }
 
     console.log("hn item from server", data);
 
+    this.props.updateIsLoadingStatus(false);
     return data;
   }
 
@@ -141,9 +145,11 @@ export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
         url = "/topstories/month";
         break;
     }
+    this.props.updateIsLoadingStatus(true);
     const response = await fetch(url);
     if (!response.ok) {
       console.error(response);
+      this.props.updateIsLoadingStatus(false);
       return;
     }
     let data: HnItem[] = await response.json();
@@ -160,6 +166,7 @@ export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
 
     console.log("hn items from server", data);
 
+    this.props.updateIsLoadingStatus(false);
     this.updateNewItems(data, activeList);
   }
 
