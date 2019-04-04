@@ -47,6 +47,8 @@ export class HnStoryPage extends React.Component<
 
     const comments = (storyData.kidsObj || []).filter(isValidComment);
 
+    document.title = `HN: ${storyData.title}`;
+
     return (
       <div>
         <h2 style={{ overflowWrap: "break-word" }}>{storyLinkEl}</h2>

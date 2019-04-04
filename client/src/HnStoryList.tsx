@@ -14,6 +14,7 @@ export class HnStoryList extends React.Component<HnStoryListProps> {
     };
   }
   render() {
+    document.title = `HN: Offline`;
     return (
       <div>
         {this.props.items.map(item => (
