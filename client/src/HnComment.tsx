@@ -101,7 +101,7 @@ export class HnComment extends React.Component<HnCommentProps, HnCommentState> {
           paddingLeft: 12 + Math.max(4 - this.props.depth),
           marginLeft:
             this.state.expandSelf && this.state.isOpen
-              ? -15 * this.props.depth
+              ? -17 * this.props.depth
               : 0,
 
           borderLeftColor: borderColor,
