@@ -1,6 +1,6 @@
 import localForage from "localforage";
 import _ from "lodash";
-import LZString from "lz-string";
+
 import React from "react";
 
 export interface LocalStorageWrapperProps<TDataType> {
@@ -39,9 +39,9 @@ export class LocalStorageWrapper<TDataType> extends React.Component<
       );
       return;
     }
-    const item = LZString.decompress(itemCompressed);
+
     // seems to be some sort of corruption on load.. clear localStorage
-    if (item === null) {
+    if (itemCompressed === null) {
       localForage.removeItem(this.props.storageName);
       this.setState({ item: undefined }, () =>
         this.props.dataDidUpdate(undefined)
@@ -49,7 +49,7 @@ export class LocalStorageWrapper<TDataType> extends React.Component<
       return;
     }
     // parse JSON for what was found
-    const obj = JSON.parse(item) as TDataType;
+    const obj = JSON.parse(itemCompressed) as TDataType;
     this.setState({ item: obj }, () => this.props.dataDidUpdate(obj));
   }
   componentDidUpdate(
@@ -71,8 +71,8 @@ export class LocalStorageWrapper<TDataType> extends React.Component<
       console.log("save item", this.props.activeItem);
       // compress and save
       const strToStore = JSON.stringify(this.props.activeItem);
-      const strToStoreCompressed = LZString.compress(strToStore);
-      localForage.setItem(this.props.storageName, strToStoreCompressed);
+
+      localForage.setItem(this.props.storageName, strToStore);
       this.setState({ item: this.props.activeItem }, () => {
         console.log("updating data after a save?");
         this.props.dataDidUpdate(this.props.activeItem);
