@@ -96,7 +96,9 @@ class _App extends React.Component<AppPageProps, AppState> {
 
         <Header
           requestNewData={() => {
-            this.dataLayer.current!.loadData(this.state.activeList);
+            if (!this.state.isLoading) {
+              this.dataLayer.current!.loadData(this.state.activeList);
+            }
           }}
           isLoading={this.state.isLoading}
         />

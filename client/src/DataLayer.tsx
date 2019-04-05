@@ -9,6 +9,8 @@ interface DataLayerState {
   currentLists: DataList[];
 
   isLoadingFresh: boolean;
+
+  isLoadingNewData: boolean;
 }
 
 export interface DataList {
@@ -29,7 +31,8 @@ export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
     this.state = {
       allItems: [],
       currentLists: [],
-      isLoadingFresh: false
+      isLoadingFresh: false,
+      isLoadingNewData: false
     };
   }
 
@@ -145,11 +148,19 @@ export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
         url = "/topstories/month";
         break;
     }
+
+    if (this.state.isLoadingNewData) {
+      console.log("only have one request at a time");
+      return;
+    }
+
     this.props.updateIsLoadingStatus(true);
+    this.setState({ isLoadingNewData: true });
     const response = await fetch(url);
     if (!response.ok) {
       console.error(response);
       this.props.updateIsLoadingStatus(false);
+      this.setState({ isLoadingNewData: false });
       return;
     }
     let data: HnItem[] = await response.json();
@@ -167,6 +178,7 @@ export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
     console.log("hn items from server", data);
 
     this.props.updateIsLoadingStatus(false);
+    this.setState({ isLoadingNewData: false });
     this.updateNewItems(data, activeList);
   }
 
