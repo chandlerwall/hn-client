@@ -17,9 +17,11 @@ export class HnStoryList extends React.Component<HnStoryListProps> {
     document.title = `HN: Offline`;
     return (
       <div>
-        {this.props.items.map(item => (
-          <HnListItem data={item} key={item.id} />
-        ))}
+        {this.props.items
+          .filter(sotry => sotry.descendants !== undefined)
+          .map(item => (
+            <HnListItem data={item} key={item.id} />
+          ))}
       </div>
     );
   }
