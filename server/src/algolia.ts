@@ -8,7 +8,7 @@ export class AlgoliaApi {
 
     var options = {
       uri:
-        "https://hn.algolia.com/api/v1/search?tags=story&numericFilters=created_at_i>" +
+        "https://hn.algolia.com/api/v1/search?tags=story&hitsPerPage=30&numericFilters=created_at_i>" +
         timestamp,
 
       json: true
@@ -26,7 +26,7 @@ export class AlgoliaApi {
 
     var options = {
       uri:
-        "https://hn.algolia.com/api/v1/search?tags=story&numericFilters=created_at_i>" +
+        "https://hn.algolia.com/api/v1/search?tags=story&hitsPerPage=30&numericFilters=created_at_i>" +
         timestamp,
 
       json: true
@@ -44,7 +44,7 @@ export class AlgoliaApi {
 
     var options = {
       uri:
-        "https://hn.algolia.com/api/v1/search?tags=story&numericFilters=created_at_i>" +
+        "https://hn.algolia.com/api/v1/search?tags=story&hitsPerPage=30&numericFilters=created_at_i>" +
         timestamp,
 
       json: true
