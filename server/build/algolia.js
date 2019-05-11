@@ -48,7 +48,7 @@ var AlgoliaApi = /** @class */ (function () {
                     case 0:
                         timestamp = helpers_1._getUnixTimestamp() - 60 * 60 * 24;
                         options = {
-                            uri: "https://hn.algolia.com/api/v1/search?tags=story&numericFilters=created_at_i>" +
+                            uri: "https://hn.algolia.com/api/v1/search?tags=story&hitsPerPage=30&numericFilters=created_at_i>" +
                                 timestamp,
                             json: true
                         };
@@ -70,7 +70,7 @@ var AlgoliaApi = /** @class */ (function () {
                     case 0:
                         timestamp = helpers_1._getUnixTimestamp() - 60 * 60 * 24 * 7;
                         options = {
-                            uri: "https://hn.algolia.com/api/v1/search?tags=story&numericFilters=created_at_i>" +
+                            uri: "https://hn.algolia.com/api/v1/search?tags=story&hitsPerPage=30&numericFilters=created_at_i>" +
                                 timestamp,
                             json: true
                         };
@@ -92,7 +92,7 @@ var AlgoliaApi = /** @class */ (function () {
                     case 0:
                         timestamp = helpers_1._getUnixTimestamp() - 60 * 60 * 24 * 30;
                         options = {
-                            uri: "https://hn.algolia.com/api/v1/search?tags=story&numericFilters=created_at_i>" +
+                            uri: "https://hn.algolia.com/api/v1/search?tags=story&hitsPerPage=30&numericFilters=created_at_i>" +
                                 timestamp,
                             json: true
                         };
