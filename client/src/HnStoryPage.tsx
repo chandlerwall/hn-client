@@ -100,6 +100,7 @@ export class HnStoryPage extends React.Component<
     const matches = link.href.match(regex);
 
     if (matches === null) {
+      link.target = "_blank";
       return;
     }
 
