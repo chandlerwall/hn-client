@@ -26,7 +26,9 @@ export class HnListItem extends React.Component<HnStoryProps> {
       story.url === undefined ? (
         <Link to={"/story/" + story.id}>{story.title}</Link>
       ) : (
-        <a href={story.url}>{story.title}</a>
+        <a href={story.url} target="_blank">
+          {story.title}
+        </a>
       );
 
     return (
