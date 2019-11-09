@@ -85,8 +85,8 @@ var Server = /** @class */ (function () {
                 }
             });
         }); });
-        app.get("/", function (req, res) {
-            // 404 for the rest?
+        app.get("*", function (req, res) {
+            // need to respond to all pages so that BrowserRouter works
             res.sendFile(path.join(__dirname, "../../client/build/index.html"));
         });
         var port = process.env.PORT || 3001;
