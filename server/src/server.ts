@@ -59,8 +59,8 @@ export class Server {
       res.json({ error: "story not found" });
     });
 
-    app.get("/", (req, res) => {
-      // 404 for the rest?
+    app.get("*", (req, res) => {
+      // need to respond to all pages so that BrowserRouter works
       res.sendFile(path.join(__dirname, "../../client/build/index.html"));
     });
 
