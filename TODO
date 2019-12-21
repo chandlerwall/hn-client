@@ -1,6 +1,8 @@
 Top Priorities:
     ☐ Server side should also maintain a single array of data
     ☐ Keep track of comment collapse state when returning to pages?
+    ☐ Make the DataLayer a HOC or a comp that takes children - hopefully get better workflow for data steps
+    ☐ Get rid of the bootstrap dependence and use the NavBar from Blueprint JS
     
 Other options:
     ☐ Allow paging through days of results (or weeks or months)
