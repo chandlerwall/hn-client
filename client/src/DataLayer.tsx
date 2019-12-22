@@ -218,7 +218,7 @@ export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
       this.props.provideNewItems(items, list.key);
     });
 
-    // send out update caommands to each one
+    // send out update commands to each one
   }
 
   updateNewItems(data: HnItem[] | undefined, listType: HnListSource): void {

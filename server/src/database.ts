@@ -1,6 +1,6 @@
 import * as nedb from "nedb";
 
-import { AlgoliaApi } from "./algolia";
+import { AlgoliaApi, HITS_PER_PAGE } from "./algolia";
 import { HackerNewsApi } from "./api";
 import { _getUnixTimestamp } from "./helpers";
 import { ItemExt, TopStories, TopStoriesType } from "./interfaces";
@@ -150,7 +150,7 @@ async function _getTopStories(type: TopStoriesType) {
     case "topstories":
       return (await HackerNewsApi.get().fetchItemIds("topstories")).slice(
         0,
-        30
+        HITS_PER_PAGE
       );
     case "day":
       return await AlgoliaApi.getDay();

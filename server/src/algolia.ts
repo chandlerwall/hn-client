@@ -2,14 +2,14 @@ import * as rp from "request-promise";
 
 import { _getUnixTimestamp } from "./helpers";
 
+export const HITS_PER_PAGE = 50;
+
 export class AlgoliaApi {
   static async getDay() {
     let timestamp = _getUnixTimestamp() - 60 * 60 * 24;
 
     var options = {
-      uri:
-        "https://hn.algolia.com/api/v1/search?tags=story&hitsPerPage=30&numericFilters=created_at_i>" +
-        timestamp,
+      uri: `https://hn.algolia.com/api/v1/search?tags=story&hitsPerPage=${HITS_PER_PAGE}&numericFilters=created_at_i>${timestamp}`,
 
       json: true
     };
@@ -25,9 +25,7 @@ export class AlgoliaApi {
     let timestamp = _getUnixTimestamp() - 60 * 60 * 24 * 7;
 
     var options = {
-      uri:
-        "https://hn.algolia.com/api/v1/search?tags=story&hitsPerPage=30&numericFilters=created_at_i>" +
-        timestamp,
+      uri: `https://hn.algolia.com/api/v1/search?tags=story&hitsPerPage=${HITS_PER_PAGE}&numericFilters=created_at_i>${timestamp}`,
 
       json: true
     };
@@ -43,9 +41,7 @@ export class AlgoliaApi {
     let timestamp = _getUnixTimestamp() - 60 * 60 * 24 * 30;
 
     var options = {
-      uri:
-        "https://hn.algolia.com/api/v1/search?tags=story&hitsPerPage=30&numericFilters=created_at_i>" +
-        timestamp,
+      uri: `https://hn.algolia.com/api/v1/search?tags=story&hitsPerPage=${HITS_PER_PAGE}&numericFilters=created_at_i>${timestamp}`,
 
       json: true
     };
