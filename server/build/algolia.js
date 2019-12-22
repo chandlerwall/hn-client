@@ -37,6 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var rp = require("request-promise");
 var helpers_1 = require("./helpers");
+exports.HITS_PER_PAGE = 50;
 var AlgoliaApi = /** @class */ (function () {
     function AlgoliaApi() {
     }
@@ -48,8 +49,7 @@ var AlgoliaApi = /** @class */ (function () {
                     case 0:
                         timestamp = helpers_1._getUnixTimestamp() - 60 * 60 * 24;
                         options = {
-                            uri: "https://hn.algolia.com/api/v1/search?tags=story&hitsPerPage=30&numericFilters=created_at_i>" +
-                                timestamp,
+                            uri: "https://hn.algolia.com/api/v1/search?tags=story&hitsPerPage=" + exports.HITS_PER_PAGE + "&numericFilters=created_at_i>" + timestamp,
                             json: true
                         };
                         return [4 /*yield*/, rp(options)];
@@ -70,8 +70,7 @@ var AlgoliaApi = /** @class */ (function () {
                     case 0:
                         timestamp = helpers_1._getUnixTimestamp() - 60 * 60 * 24 * 7;
                         options = {
-                            uri: "https://hn.algolia.com/api/v1/search?tags=story&hitsPerPage=30&numericFilters=created_at_i>" +
-                                timestamp,
+                            uri: "https://hn.algolia.com/api/v1/search?tags=story&hitsPerPage=" + exports.HITS_PER_PAGE + "&numericFilters=created_at_i>" + timestamp,
                             json: true
                         };
                         return [4 /*yield*/, rp(options)];
@@ -92,8 +91,7 @@ var AlgoliaApi = /** @class */ (function () {
                     case 0:
                         timestamp = helpers_1._getUnixTimestamp() - 60 * 60 * 24 * 30;
                         options = {
-                            uri: "https://hn.algolia.com/api/v1/search?tags=story&hitsPerPage=30&numericFilters=created_at_i>" +
-                                timestamp,
+                            uri: "https://hn.algolia.com/api/v1/search?tags=story&hitsPerPage=" + exports.HITS_PER_PAGE + "&numericFilters=created_at_i>" + timestamp,
                             json: true
                         };
                         return [4 /*yield*/, rp(options)];

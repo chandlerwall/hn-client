@@ -203,7 +203,7 @@ function _getTopStories(type) {
                     }
                     return [3 /*break*/, 9];
                 case 1: return [4 /*yield*/, api_1.HackerNewsApi.get().fetchItemIds("topstories")];
-                case 2: return [2 /*return*/, (_b.sent()).slice(0, 30)];
+                case 2: return [2 /*return*/, (_b.sent()).slice(0, algolia_1.HITS_PER_PAGE)];
                 case 3: return [4 /*yield*/, algolia_1.AlgoliaApi.getDay()];
                 case 4: return [2 /*return*/, _b.sent()];
                 case 5: return [4 /*yield*/, algolia_1.AlgoliaApi.getMonth()];
