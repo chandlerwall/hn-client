@@ -21,6 +21,7 @@ export interface DataList {
 interface DataLayerProps {
   provideNewItems(items: HnItem[], listType: HnListSource): void;
   updateIsLoadingStatus(newStatus: boolean): void;
+  loadFreshSource: HnListSource;
 }
 
 export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
@@ -202,8 +203,9 @@ export class DataLayer extends React.Component<DataLayerProps, DataLayerState> {
 
     if (allItems === undefined || allLists === undefined) {
       if (!this.state.isLoadingFresh) {
-        this.loadData(HnListSource.Front);
+        console.log("local storage is empty, loading fresh data based on active page", this.props.loadFreshSource);
         this.setState({ isLoadingFresh: true });
+        this.loadData(this.props.loadFreshSource);
       }
       return;
     }

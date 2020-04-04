@@ -92,6 +92,7 @@ class _App extends React.Component<AppPageProps, AppState> {
           ref={this.dataLayer}
           provideNewItems={this.newItemsProvided}
           updateIsLoadingStatus={isLoading => this.setState({ isLoading })}
+          loadFreshSource={this.state.activeList}
         />
 
         <Header
